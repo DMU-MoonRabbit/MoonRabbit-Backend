@@ -33,4 +33,14 @@ public class PlaylistController {
     public void deletePlaylists(@RequestBody List<Long> ids) {
          playlistService.deleteAllByIds(ids);
     }
+
+    //플레이 리스트 수정 (인덱스)
+    @PutMapping("/{id}")
+    public Playlist updatePlaylist(
+            @PathVariable Long id,
+            @RequestBody PlaylistRequestDto dto
+    ) {
+        return playlistService.update(id, dto);
+    }
+
 }

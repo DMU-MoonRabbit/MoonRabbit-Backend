@@ -75,6 +75,24 @@ public class PlaylistService {
         playlistRepository.deleteAllById(ids);
     }
 
+    //플레이리스트 수정
+    public Playlist update(Long id, PlaylistRequestDto dto) {
+        Playlist playlist = playlistRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 플레이리스트가 없습니다: " + id));
+
+        // 새로운 영상 ID 추출
+        String videoId = extractVideoId(dto.getVideoUrl());
+        String thumbnailUrl = "https://img.youtube.com/vi/" + videoId + "/0.jpg";
+
+        // 필드 수정
+        playlist.setTitle(dto.getTitle());
+        playlist.setVideoUrl(dto.getVideoUrl());
+        playlist.setVideoId(videoId);
+        playlist.setThumbnailUrl(thumbnailUrl);
+
+        return playlistRepository.save(playlist);
+    }
+
 
 
 }
