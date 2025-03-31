@@ -1,6 +1,7 @@
-package com.bigpicture.moonrabbit.global.auth.kakao;
-import com.bigpicture.moonrabbit.domain.user.entity.User;
+package com.bigpicture.moonrabbit.global.auth.kakao.controller;
 import com.bigpicture.moonrabbit.domain.user.repository.UserRepository;
+import com.bigpicture.moonrabbit.global.auth.kakao.service.KakaoAuthService;
+import com.bigpicture.moonrabbit.global.auth.kakao.dto.KakaoUserResponseDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

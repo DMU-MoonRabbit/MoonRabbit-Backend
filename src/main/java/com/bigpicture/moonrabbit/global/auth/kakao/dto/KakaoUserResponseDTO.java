@@ -1,4 +1,4 @@
-package com.bigpicture.moonrabbit.global.auth.kakao;
+package com.bigpicture.moonrabbit.global.auth.kakao.dto;
 
 import lombok.Getter;
 import lombok.Setter;

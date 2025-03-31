@@ -1,7 +1,8 @@
-package com.bigpicture.moonrabbit.global.auth.kakao;
+package com.bigpicture.moonrabbit.global.auth.kakao.service;
 
 import com.bigpicture.moonrabbit.domain.user.entity.User;
 import com.bigpicture.moonrabbit.domain.user.repository.UserRepository;
+import com.bigpicture.moonrabbit.global.auth.kakao.dto.KakaoUserResponseDTO;
 import com.bigpicture.moonrabbit.global.exception.CustomException;
 import com.bigpicture.moonrabbit.global.exception.ErrorCode;
 import org.springframework.beans.factory.annotation.Value;
