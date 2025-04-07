@@ -2,6 +2,8 @@ package com.bigpicture.moonrabbit.global.config;
 
 import com.bigpicture.moonrabbit.global.auth.jwt.filter.JwtAuthenticationFilter;
 import com.bigpicture.moonrabbit.global.auth.jwt.provider.JwtProvider;
+import com.bigpicture.moonrabbit.global.auth.oauth2.CustomOAuth2UserService;
+import com.bigpicture.moonrabbit.global.auth.oauth2.handler.OAuth2LoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +21,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
     private final JwtProvider jwtTokenProvider;
-
+    private final OAuth2LoginSuccessHandler oAuth2SuccessHandler;
+    private final CustomOAuth2UserService customOAuth2UserService;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
@@ -31,11 +34,16 @@ public class SecurityConfig {
                 .sessionManagement(sessionManagementConfigurer -> sessionManagementConfigurer
                                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/oauth2/**", "/login/**").permitAll()
                         // 해당 API에 대해서는 모든 요청을 허가
                         //  .requestMatchers("경로", "경로").permitAll()
 
                         // 이 밖에 모든 요청에 대해서 인증을 필요로 한다는 설정
-                        .anyRequest().permitAll())
+                        .anyRequest().authenticated())
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo->userInfo
+                                .userService(customOAuth2UserService))
+                        .successHandler(oAuth2SuccessHandler))
 
                 // JWT 인증을 위하여 직접 구현한 필터를 UsernamePasswordAuthenticationFilter 전에 실행
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
