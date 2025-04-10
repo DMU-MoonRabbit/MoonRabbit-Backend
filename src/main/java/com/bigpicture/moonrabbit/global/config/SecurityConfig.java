@@ -30,20 +30,37 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
+
                 // JWT를 사용하기 때문에 세션을 사용하지 않음
-                .sessionManagement(sessionManagementConfigurer -> sessionManagementConfigurer
-                                   .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(sessionManagementConfigurer ->
+                        sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .authorizeHttpRequests(authorize -> authorize
+
                         .requestMatchers("/oauth2/**", "/login/**").permitAll()
+
+                        // Swagger 관련 경로 열어두기
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).permitAll()
+
+
                         // 해당 API에 대해서는 모든 요청을 허가
-                        //  .requestMatchers("경로", "경로").permitAll()
+                        // .requestMatchers("경로", "경로").permitAll()
 
                         // 이 밖에 모든 요청에 대해서 인증을 필요로 한다는 설정
+
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo->userInfo
                                 .userService(customOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler))
+                        .anyRequest().permitAll()
+                )
+
 
                 // JWT 인증을 위하여 직접 구현한 필터를 UsernamePasswordAuthenticationFilter 전에 실행
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
@@ -58,4 +75,3 @@ public class SecurityConfig {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 }
-
