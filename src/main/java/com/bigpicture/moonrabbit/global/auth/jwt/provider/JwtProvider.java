@@ -78,4 +78,18 @@ public class JwtProvider {
             return e.getClaims();
         }
     }
+    public String createToken(String email, String role) {
+        // 토큰 유효시간 설정 (예: 1시간)
+        long now = System.currentTimeMillis();
+        long validity = 1000 * 60 * 60;
+
+        return Jwts.builder()
+                .setSubject(email) // 사용자 이메일을 sub에 저장
+                .claim("auth", role) // 권한은 커스텀 claim으로 저장
+                .setIssuedAt(new java.util.Date(now))
+                .setExpiration(new java.util.Date(now + validity))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
 }
