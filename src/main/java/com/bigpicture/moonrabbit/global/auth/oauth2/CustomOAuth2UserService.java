@@ -21,18 +21,39 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        // 1. 기본 사용자 정보 가져오기
         OAuth2User oAuth2User = super.loadUser(userRequest);
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
-        // 2. 제공자 정보
-        String provider = userRequest.getClientRegistration().getRegistrationId(); // ex: "google"
-        String providerId = (String) attributes.get("sub"); // Google은 sub가 고유 ID
-        String email = (String) attributes.get("email");
-        String name = (String) attributes.get("name");
-        String picture = (String) attributes.get("picture");
+        String provider = userRequest.getClientRegistration().getRegistrationId(); // ex: "google" or "kakao"
 
-        // 3. 이메일 기준으로 기존 사용자 조회
+        String providerId;
+        String email;
+        String name;
+        String picture;
+
+        if (provider.equals("kakao")) {
+            Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+            Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+
+            providerId = String.valueOf(attributes.get("id"));
+            email = (String) kakaoAccount.get("email");
+            name = (String) profile.get("nickname");
+            picture = (String) profile.get("profile_image_url");
+
+            log.info("[OAuth2-KAKAO] id: {}", providerId);
+            log.info("[OAuth2-KAKAO] email: {}", email);
+            log.info("[OAuth2-KAKAO] nickname: {}", name);
+            log.info("[OAuth2-KAKAO] profile image: {}", picture);
+        } else if (provider.equals("google")) {
+            providerId = (String) attributes.get("sub");
+            email = (String) attributes.get("email");
+            name = (String) attributes.get("name");
+            picture = (String) attributes.get("picture");
+        } else {
+            throw new OAuth2AuthenticationException("지원하지 않는 OAuth2 제공자입니다: " + provider);
+        }
+        System.out.println("attributes = " + attributes);
+
         User user = userRepository.findByEmail(email).orElseGet(() ->
                 userRepository.save(User.builder()
                         .email(email)
@@ -44,7 +65,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                         .build())
         );
 
-        // 4. 인증된 사용자 반환
         return new CustomOAuth2User(user.getRole(), attributes, "sub");
     }
+
 }
