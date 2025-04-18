@@ -21,6 +21,10 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      # 권한 추가
+      - name: Add execute permission to gradlew
+        run: chmod +x gradlew
+        
       # 3. 애플리케이션 빌드
       - name: Build with Gradle
         run: ./gradlew clean build -x test
