@@ -1,35 +1,48 @@
-name: Deploy to EC2
+name: Deploy to EC2 
 
 on:
   push:
     branches:
-      - main  # main 브랜치에 푸시될 때 자동으로 배포가 실행됨
+      - main 
 
 jobs:
-  build:
-    runs-on: ubuntu-latest  # GitHub Actions는 Ubuntu 환경에서 실행됨
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v2
+  deploy:
+    runs-on: ubuntu-latest
 
+    steps:
+      # 1. 깃헙 레포지토리 코드 가져오기
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      # 2. Java 21 설치
       - name: Set up JDK 21
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: '21'
-          distribution: 'adoptopenjdk'
+          distribution: 'temurin'
 
+      # 3. Gradle로 프로젝트 빌드
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew clean build -x test
 
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v0.1.5
-        with:
-          host: ${{ secrets.EC2_HOST }}  # EC2 IP
-          username: ${{ secrets.EC2_USER }}  # EC2 사용자
-          key: ${{ secrets.EC2_PRIVATE_KEY }}  # EC2의 SSH 비공개 키
-          port: 22
-          script: |
-            cd /home/ubuntu/myapp  # EC2에서 프로젝트 디렉토리로 이동
-            git pull origin main  # 최신 코드 받아오기
-            ./gradlew build  # 빌드하기
-            sudo systemctl restart myapp.service  # 서비스 재시작 (systemd 서비스 관리)
+      # 4. GitHub Secrets에서 EC2 접속용 프라이빗 키를 가져와 파일로 저장
+      - name: Create private key file
+        run: |
+          echo "${{ secrets.EC2_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem  # 권한 제한 (보안)
+
+      # 5. 빌드된 JAR 파일을 EC2 서버로 업로드
+      - name: Upload JAR to EC2
+        run: |
+          scp -i private_key.pem \                           # -i: SSH 키 지정
+            -o StrictHostKeyChecking=no \                    # 호스트 인증 생략 (초기 연결용)
+            build/libs/*.jar \                               # 빌드된 JAR 파일 경로
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/app.jar
+
+      # 6. EC2에 접속해서 기존 앱 종료 후 새로 실행 (백그라운드 실행)
+      - name: Run app on EC2
+        run: |
+          ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            pkill -f 'java -jar' || true   # 이전 실행 중인 앱 종료 (실패해도 무시)
+            nohup java -jar /home/${USER}/app.jar > app.log 2>&1 &  # 새로 실행 & 로그 저장
+          EOF
