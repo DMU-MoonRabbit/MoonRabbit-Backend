@@ -8,7 +8,7 @@ services:
     ports:
       - "8080:8080"
     env_file:
-      - .env
+      - ./moonrabbit.env
     environment:
       SPRING_DATASOURCE_URL: ${DB_URL}
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
