@@ -44,22 +44,32 @@ jobs:
         run: docker save moonrabbit-app | gzip > moonrabbit-app.tar.gz
 
       # 7. EC2로 전송
+      - name: Check EC2 availability
+        run: |
+          timeout 10 bash -c "</dev/tcp/${{ secrets.EC2_HOST }}/22" || {
+            echo "EC2 SSH 포트 접속 실패";
+            exit 1;
+          }
+          
+      # 8. 이미지 전송
       - name: Upload Docker image to EC2
         run: |
-          scp -i private_key.pem -o StrictHostKeyChecking=no moonrabbit-app.tar.gz \
+          scp -i private_key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=10 moonrabbit-app.tar.gz \
           ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/
 
-      # 8. EC2에서 Docker 이미지 로드 & 실행
-      - name: Run Docker container on EC2
+      # 9. EC2에 접속해서 Docker 실행
+      - name: Deploy Docker image on EC2
         run: |
           ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            # Docker 이미지 로드
+            set -e
+
+            echo "이미지 로드 중..."
             gunzip -c moonrabbit-app.tar.gz | docker load
 
-            # 이전 컨테이너 종료 & 삭제
+            echo "기존 컨테이너 정리 중..."
             docker stop moonrabbit-app || true
             docker rm moonrabbit-app || true
 
-            # 새 컨테이너 실행
+            echo "새 컨테이너 실행 중..."
             docker run -d --name moonrabbit-app -p 8080:8080 moonrabbit-app
           EOF
