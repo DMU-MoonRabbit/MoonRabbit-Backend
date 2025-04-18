@@ -22,26 +22,28 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity
+        httpSecurity
                 // REST API이므로 basic auth 및 csrf 보안을 사용하지 않음
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
-                // JWT를 사용하기 때문에 세션을 사용하지 않음
-                .sessionManagement(sessionManagementConfigurer -> sessionManagementConfigurer
-                                   .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authorize -> authorize
-                        // 해당 API에 대해서는 모든 요청을 허가
-                        //  .requestMatchers("경로", "경로").permitAll()
-
-                        // 이 밖에 모든 요청에 대해서 인증을 필요로 한다는 설정
-                        .anyRequest().permitAll())
-
-                // JWT 인증을 위하여 직접 구현한 필터를 UsernamePasswordAuthenticationFilter 전에 실행
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
-                        UsernamePasswordAuthenticationFilter.class
+                // 세션 정책 설정
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .build();
+                // 요청 권한 설정
+                .authorizeHttpRequests(authorize -> authorize
+                        // 인증 없이 접근 가능한 엔드포인트 (필요시 추가)
+                        //.requestMatchers("/auth/**", "/public/**").permitAll()
+                        .anyRequest().permitAll()
+                )
+                // JWT 필터 등록
+                .addFilterBefore(
+                        new JwtAuthenticationFilter(jwtTokenProvider),
+                        UsernamePasswordAuthenticationFilter.class
+                );
+
+        return httpSecurity.build();
     }
 
     @Bean
