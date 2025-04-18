@@ -53,11 +53,12 @@ jobs:
             exit 1;
           }
 
-      # 8. 이미지 전송
-      - name: Upload Docker image to EC2
+      # 8. 이미지 전송 (rsync)
+      - name: Upload Docker image to EC2 via rsync
         run: |
-          scp -i private_key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=10 moonrabbit-app.tar.gz \
-          ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/
+              rsync -avz -e "ssh -i private_key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=30" \
+              moonrabbit-app.tar.gz ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/
+
 
       # 9. EC2에 접속해서 Docker 실행
       - name: Deploy Docker image on EC2
