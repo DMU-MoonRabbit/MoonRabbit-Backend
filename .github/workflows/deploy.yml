@@ -1,48 +1,61 @@
-name: Deploy to EC2 
+name: Docker Deploy to EC2
 
 on:
   push:
     branches:
-      - main 
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. 깃헙 레포지토리 코드 가져오기
-      - name: Checkout source
+      # 1. 소스코드 체크아웃
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Java 21 설치
+      # 2. JDK 설치
       - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
           java-version: '21'
           distribution: 'temurin'
 
-      # 3. Gradle로 프로젝트 빌드
+      # 3. 애플리케이션 빌드
       - name: Build with Gradle
         run: ./gradlew clean build -x test
 
-      # 4. GitHub Secrets에서 EC2 접속용 프라이빗 키를 가져와 파일로 저장
-      - name: Create private key file
+      # 4. Docker 이미지 빌드
+      - name: Build Docker Image
+        run: docker build -t moonrabbit-app .
+
+      # 5. EC2 접속용 PEM 키 생성
+      - name: Create private key
         run: |
           echo "${{ secrets.EC2_PRIVATE_KEY }}" > private_key.pem
-          chmod 600 private_key.pem  # 권한 제한 (보안)
+          chmod 600 private_key.pem
 
-      # 5. 빌드된 JAR 파일을 EC2 서버로 업로드
-      - name: Upload JAR to EC2
+      # 6. Docker 이미지 저장 → 압축
+      - name: Save Docker image to archive
+        run: docker save moonrabbit-app | gzip > moonrabbit-app.tar.gz
+
+      # 7. EC2로 전송
+      - name: Upload Docker image to EC2
         run: |
-          scp -i private_key.pem \                           # -i: SSH 키 지정
-            -o StrictHostKeyChecking=no \                    # 호스트 인증 생략 (초기 연결용)
-            build/libs/*.jar \                               # 빌드된 JAR 파일 경로
-            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/app.jar
+          scp -i private_key.pem -o StrictHostKeyChecking=no moonrabbit-app.tar.gz \
+          ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/
 
-      # 6. EC2에 접속해서 기존 앱 종료 후 새로 실행 (백그라운드 실행)
-      - name: Run app on EC2
+      # 8. EC2에서 Docker 이미지 로드 & 실행
+      - name: Run Docker container on EC2
         run: |
           ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            pkill -f 'java -jar' || true   # 이전 실행 중인 앱 종료 (실패해도 무시)
-            nohup java -jar /home/${USER}/app.jar > app.log 2>&1 &  # 새로 실행 & 로그 저장
+            # Docker 이미지 로드
+            gunzip -c moonrabbit-app.tar.gz | docker load
+
+            # 이전 컨테이너 종료 & 삭제
+            docker stop moonrabbit-app || true
+            docker rm moonrabbit-app || true
+
+            # 새 컨테이너 실행
+            docker run -d --name moonrabbit-app -p 8080:8080 moonrabbit-app
           EOF
