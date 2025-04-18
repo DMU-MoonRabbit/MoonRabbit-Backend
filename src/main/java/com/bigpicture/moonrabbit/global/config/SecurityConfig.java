@@ -2,6 +2,8 @@ package com.bigpicture.moonrabbit.global.config;
 
 import com.bigpicture.moonrabbit.global.auth.jwt.filter.JwtAuthenticationFilter;
 import com.bigpicture.moonrabbit.global.auth.jwt.provider.JwtProvider;
+import com.bigpicture.moonrabbit.global.auth.oauth2.CustomOAuth2UserService;
+import com.bigpicture.moonrabbit.global.auth.oauth2.handler.OAuth2LoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,31 +21,52 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
     private final JwtProvider jwtTokenProvider;
-
+    private final OAuth2LoginSuccessHandler oAuth2SuccessHandler;
+    private final CustomOAuth2UserService customOAuth2UserService;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
+        return httpSecurity
                 // REST API이므로 basic auth 및 csrf 보안을 사용하지 않음
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
-                // 세션 정책 설정
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                // 요청 권한 설정
+
+                // JWT를 사용하기 때문에 세션을 사용하지 않음
+                .sessionManagement(sessionManagementConfigurer ->
+                        sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .authorizeHttpRequests(authorize -> authorize
-                        // 인증 없이 접근 가능한 엔드포인트 (필요시 추가)
-                        //.requestMatchers("/auth/**", "/public/**").permitAll()
+
+                        .requestMatchers("/oauth2/**", "/login/**").permitAll()
+
+                        // Swagger 관련 경로 열어두기
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).permitAll()
+
+
+                        // 해당 API에 대해서는 모든 요청을 허가
+                        // .requestMatchers("경로", "경로").permitAll()
+
+                        // 이 밖에 모든 요청에 대해서 인증을 필요로 한다는 설정
+
+                        .anyRequest().authenticated())
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo->userInfo
+                                .userService(customOAuth2UserService))
+                        .successHandler(oAuth2SuccessHandler))
                         .anyRequest().permitAll()
                 )
-                // JWT 필터 등록
-                .addFilterBefore(
-                        new JwtAuthenticationFilter(jwtTokenProvider),
-                        UsernamePasswordAuthenticationFilter.class
-                );
 
-        return httpSecurity.build();
+
+                // JWT 인증을 위하여 직접 구현한 필터를 UsernamePasswordAuthenticationFilter 전에 실행
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
+                        UsernamePasswordAuthenticationFilter.class
+                )
+                .build();
     }
 
     @Bean
@@ -52,4 +75,3 @@ public class SecurityConfig {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 }
-

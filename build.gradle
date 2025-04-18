@@ -1,7 +1,8 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.4.3'
-	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.springframework.boot' version '3.1.4'
+	id 'io.spring.dependency-management' version '1.1.3'
+
 }
 
 group = 'com.bigpicture'
@@ -24,30 +25,37 @@ repositories {
 }
 
 dependencies {
+	// Spring Boot 기본 웹 기능
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
-	//JPA
+	// JPA (Hibernate 포함)
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
 	// 유효성 검사
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-	// Security
+	// Spring Security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
-	// jwt
+	// JWT
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
+	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// OpenAPI (Swagger)
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+
+	// MySQL 드라이버
 	runtimeOnly 'com.mysql:mysql-connector-j'
 
-	//openAPI
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
+	// 테스트 관련
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
