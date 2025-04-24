@@ -14,69 +14,68 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. JDK 설치
+      # 2. JDK 21 설치
       - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
           java-version: '21'
           distribution: 'temurin'
 
-      # 권한 추가
+      # 3. gradlew 실행 권한 부여
       - name: Add execute permission to gradlew
         run: chmod +x gradlew
 
-      # 3. 애플리케이션 빌드
+      # 4. Gradle 빌드 (테스트 제외)
       - name: Build with Gradle
         run: ./gradlew clean build -x test
 
-      # 4. Docker 이미지 빌드
+      # 5. Docker 이미지 빌드
       - name: Build Docker Image
         run: docker build -t moonrabbit-app .
 
-      # 5. EC2 접속용 PEM 키 생성
+      # 6. PEM 키 생성 (EC2 접속용)
       - name: Create private key
         run: |
           echo "${{ secrets.EC2_PRIVATE_KEY }}" > private_key.pem
           chmod 600 private_key.pem
 
-      # 6. Docker 이미지 저장 → 압축
-      - name: Save Docker image to archive
+      # 7. Docker 이미지 저장 및 압축
+      - name: Save and compress Docker image
         run: |
-          docker save -o moonrabbit-app.tar moonrabbit-app
-          gzip moonrabbit-app.tar
+          docker save moonrabbit-app | gzip > moonrabbit-app.tar.gz
 
-      # 7. EC2로 접속 가능 여부 확인
+      # 8. EC2 접속 확인
       - name: Check EC2 availability
         run: |
           timeout 10 bash -c "</dev/tcp/${{ secrets.EC2_HOST }}/22" || {
-            echo "EC2 SSH 포트 접속 실패";
+            echo "EC2 SSH 접속 실패";
             exit 1;
           }
 
-      # 8. 이미지 전송 (rsync)
+      # 9. EC2로 Docker 이미지 전송
       - name: Upload Docker image to EC2 via rsync
         run: |
-              rsync -avz -e "ssh -i private_key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=30" \
-              moonrabbit-app.tar.gz ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/
+          rsync -avz -e "ssh -i private_key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=30" \
+          moonrabbit-app.tar.gz ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/
 
-
-      # 9. EC2에 접속해서 Docker 실행
+      # 10. EC2에서 Docker 실행
       - name: Deploy Docker image on EC2
         run: |
           ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             set -e
+            cd /home/${{ secrets.EC2_USER }}
 
-            echo "이전 이미지 및 컨테이너 정리 중..."
+            echo "이전 컨테이너 및 이미지 정리..."
             docker stop moonrabbit-app || true
             docker rm moonrabbit-app || true
             rm -f moonrabbit-app.tar moonrabbit-app.tar.gz || true
 
-            echo "압축 해제 중..."
+            echo "이미지 압축 해제..."
             gunzip moonrabbit-app.tar.gz
 
-            echo "Docker 이미지 로드 중..."
+            echo "Docker 이미지 로드..."
             docker load < moonrabbit-app.tar
 
-            echo "컨테이너 실행 중..."
-            docker run -d --name moonrabbit-app -p 8080:8080 moonrabbit-app
+            echo "컨테이너 실행..."
+            docker run -d --name moonrabbit-app -p 8080:8080 --env-file moonrabbit.env moonrabbit-app
           EOF
