@@ -45,11 +45,12 @@ jobs:
           docker save moonrabbit-app | gzip > moonrabbit-app.tar.gz
 
       # 8. EC2 접속 확인
-      - name: Check EC2 availability
+      - name: Check EC2 availability (via ssh)
         run: |
-          timeout 10 bash -c "</dev/tcp/${{ secrets.EC2_HOST }}/22" || {
-            echo "EC2 SSH 접속 실패";
-            exit 1;
+          ssh -i private_key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=10 \
+          ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "echo 'SSH 연결 성공'" || {
+          echo "EC2 SSH 접속 실패";
+          exit 1;
           }
 
       # 9. EC2로 Docker 이미지 전송
