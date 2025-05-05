@@ -52,7 +52,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         } else {
             throw new OAuth2AuthenticationException("지원하지 않는 OAuth2 제공자입니다: " + provider);
         }
-        System.out.println("attributes = " + attributes);
+        //System.out.println("attributes = " + attributes);
 
         User user = userRepository.findByEmail(email).orElseGet(() ->
                 userRepository.save(User.builder()
@@ -62,10 +62,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                         .provider(provider)
                         .providerId(providerId)
                         .role("USER")
+                        .level(1)
                         .build())
         );
-
-        return new CustomOAuth2User(user.getRole(), attributes, "sub");
+        String nameAttributeKey = provider.equals("kakao") ? "id" : "sub";
+        return new CustomOAuth2User(user.getRole(), attributes, nameAttributeKey);
     }
 
 }
