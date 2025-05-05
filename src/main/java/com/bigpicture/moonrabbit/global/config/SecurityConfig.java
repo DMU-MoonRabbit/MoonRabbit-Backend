@@ -23,15 +23,18 @@ public class SecurityConfig {
     private final JwtProvider jwtTokenProvider;
     private final OAuth2LoginSuccessHandler oAuth2SuccessHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
+
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity
+
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
-                .sessionManagement(sessionManagementConfigurer ->
-                        sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authorize -> authorize
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/oauth2/**", "/login/**").permitAll()
                         .requestMatchers(
                                 "/swagger-ui/**",
@@ -43,19 +46,21 @@ public class SecurityConfig {
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService))
+                                .userService(customOAuth2UserService)
+                        )
                         .successHandler(oAuth2SuccessHandler)
                 )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
+                .addFilterBefore(
+                        new JwtAuthenticationFilter(jwtTokenProvider),
                         UsernamePasswordAuthenticationFilter.class
-                )
-                .build();
+                );
+
+        return http.build();
     }
 
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // BCrypt Encoder 사용
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 }
