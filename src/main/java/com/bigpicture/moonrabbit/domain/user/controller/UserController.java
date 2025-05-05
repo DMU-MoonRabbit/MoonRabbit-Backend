@@ -2,6 +2,7 @@ package com.bigpicture.moonrabbit.domain.user.controller;
 
 
 import com.bigpicture.moonrabbit.domain.user.dto.LoginRequestDTO;
+import com.bigpicture.moonrabbit.domain.user.dto.UserRequestDTO;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
 import com.bigpicture.moonrabbit.domain.user.dto.UserResponseDTO;
 import com.bigpicture.moonrabbit.domain.user.service.UserService;
@@ -23,9 +24,8 @@ public class UserController {
 
     // 유저 저장
     @PostMapping("/save")
-    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody User user) {
-        User savedUser = userService.saveUser(user);
-        UserResponseDTO responseDTO = new UserResponseDTO(savedUser);
+    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserRequestDTO userRequestDTO) {
+        UserResponseDTO responseDTO = userService.saveUser(userRequestDTO);
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
