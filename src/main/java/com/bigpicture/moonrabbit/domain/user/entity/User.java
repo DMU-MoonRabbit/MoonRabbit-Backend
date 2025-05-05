@@ -1,10 +1,16 @@
 package com.bigpicture.moonrabbit.domain.user.entity;
 
+import com.bigpicture.moonrabbit.domain.board.entity.Board;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import java.util.List;
+import java.time.LocalDateTime;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,12 +28,23 @@ public class User {
     private String email;
 
     @Column(nullable = true)
-    @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{8,}$",
-            message = "비밀번호는 최소 8자 이상이어야 하며, 적어도 하나의 영문자와 하나의 특수 문자를 포함해야 합니다.")
     private String password;
-    private String provider;
+
+    private String provider = "common";
     private String providerId;
     private String nickname;
     private String profileImg;
     private String role = ROLE_USER;
+    private int level = 1;
+    private int exp = 0;
+    private int point = 0;
+    private boolean mentor = false;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Board> boards;
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
 }

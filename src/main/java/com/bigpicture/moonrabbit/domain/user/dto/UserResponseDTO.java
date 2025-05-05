@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 public class UserResponseDTO {
     private String email;
     private String nickname;
-    private String profileImg;
+    private String password;
 
     public UserResponseDTO(User user) {
         this.email = user.getEmail();
         this.nickname = user.getNickname();
-        this.profileImg = user.getProfileImg();
+        this.password = user.getPassword();
     }
 }

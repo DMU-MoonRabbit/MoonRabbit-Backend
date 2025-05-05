@@ -1,5 +1,7 @@
 package com.bigpicture.moonrabbit.domain.user.service;
 
+import com.bigpicture.moonrabbit.domain.user.dto.UserRequestDTO;
+import com.bigpicture.moonrabbit.domain.user.dto.UserResponseDTO;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
 import com.bigpicture.moonrabbit.domain.user.repository.UserRepository;
 import com.bigpicture.moonrabbit.global.auth.jwt.dto.JwtDTO;
@@ -20,14 +22,19 @@ public class UserService {
     private final JwtGenerator jwtGenerator; // JWT 생성기
 
     // 유저 저장
-    public User saveUser(User user) {
-        Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+    public UserResponseDTO saveUser(UserRequestDTO userRequestDTO) {
+        Optional<User> existingUser = userRepository.findByEmail(userRequestDTO.getEmail());
         if (existingUser.isPresent()) {
             throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
         }
+        User user = new User();
+        user.setEmail(userRequestDTO.getEmail());
+        user.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
+        user.setNickname(userRequestDTO.getNickname());
+        User savedUser = userRepository.save(user);
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+
+        return new UserResponseDTO(savedUser);
     }
 
     // 이메일로 유저 찾기
