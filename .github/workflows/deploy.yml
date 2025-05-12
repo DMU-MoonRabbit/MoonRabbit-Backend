@@ -49,6 +49,16 @@ jobs:
         run: |
           echo "${{ secrets.EC2_PRIVATE_KEY }}" > private_key.pem
           chmod 600 private_key.pem
+          
+      # env 파일 생성
+      - name: Generate .env file
+        run: |
+          echo "${{ secrets.MOONRABBIT_ENV }}" > moonrabbit.env
+
+      # 8.5. EC2에 .env 전송
+      - name: Copy env file to EC2
+        run: |
+          scp -o StrictHostKeyChecking=no -i private_key.pem moonrabbit.env ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/moonrabbit.env
 
       # 9. EC2에 SSH 접속 후 컨테이너 재시작
       - name: Deploy on EC2
