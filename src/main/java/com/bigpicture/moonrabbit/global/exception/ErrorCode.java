@@ -11,6 +11,8 @@ public enum ErrorCode {
     USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "U001", "이미 존재하는 이메일입니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U002", "해당 사용자를 찾을 수 없습니다."),
 
+    // 게시글 관련 에러
+    BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "B001", "해당 게시글을 찾을 수 없습니다."),
     // 입력값 검증 에러
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "V001", "잘못된 입력 값입니다."),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "V002", "이메일 혹은 비밀번호가 유효하지 않습니다."),

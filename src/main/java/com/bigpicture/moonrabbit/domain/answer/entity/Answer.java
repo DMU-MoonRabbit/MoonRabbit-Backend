@@ -1,14 +1,12 @@
-package com.bigpicture.moonrabbit.domain.board.entity;
-
-import com.bigpicture.moonrabbit.domain.answer.entity.Answer;
+package com.bigpicture.moonrabbit.domain.answer.entity;
+import com.bigpicture.moonrabbit.domain.board.entity.Board;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
-import jakarta.persistence.*;
 import lombok.*;
+import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -17,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Board {
+public class Answer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -26,19 +24,23 @@ public class Board {
     @JoinColumn(name = "user_id")  // 외래 키 설정
     private User user;  // User 엔티티와 직접 연관
 
-    private String title;
-    private String content;
-    private String emotionTag;
-    private int commentCount = 0;
-    private boolean isAnonymous = false;
-    private String aiStyle; 
-    private int reportCount = 0;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "board_id")
+    private Board board;
 
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true )
-    private List<Answer> answers;
+    private int likeCount = 0;
+
+    private String content;
 
     @CreatedDate
     private LocalDateTime createdAt;
+
+    private int reportCount = 0;
+
+
+
+
+
 
 
 }
