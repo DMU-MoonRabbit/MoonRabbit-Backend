@@ -75,7 +75,7 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/moonrabbit-app:latest
 
             echo "컨테이너 실행"
-            docker run -d --name moonrabbit-app -p 8080:8080 \
+            docker run -d --name moonrabbit-app -p 80:8080 \
               --env-file moonrabbit.env \
               ${{ secrets.DOCKER_USERNAME }}/moonrabbit-app:latest
           EOF
