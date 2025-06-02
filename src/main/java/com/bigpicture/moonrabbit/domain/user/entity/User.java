@@ -1,5 +1,6 @@
 package com.bigpicture.moonrabbit.domain.user.entity;
 
+import com.bigpicture.moonrabbit.domain.answer.entity.Answer;
 import com.bigpicture.moonrabbit.domain.board.entity.Board;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
@@ -42,6 +43,9 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Board> boards;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
+    private List<Answer> answers;
 
     @CreatedDate
     @Column(updatable = false)
