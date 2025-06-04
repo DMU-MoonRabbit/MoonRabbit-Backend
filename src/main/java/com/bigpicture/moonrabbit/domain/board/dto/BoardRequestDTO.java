@@ -13,5 +13,6 @@ public class BoardRequestDTO {
 
     private String category;
 
+    private boolean isAnonymous;
 
 }

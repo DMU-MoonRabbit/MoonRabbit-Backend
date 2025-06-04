@@ -26,6 +26,7 @@ public class BoardService {
         board.setTitle(boardDTO.getTitle());
         board.setContent(boardDTO.getContent());
         board.setCategory(boardDTO.getCategory());
+        board.setAnonymous(boardDTO.isAnonymous());
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         board.setUser(user);
         Board savedBoard = boardRepository.save(board);
