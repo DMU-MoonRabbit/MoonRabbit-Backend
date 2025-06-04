@@ -16,5 +16,10 @@ public class UserRequestDTO {
             message = "비밀번호는 최소 8자 이상이어야 하며, 적어도 하나의 영문자와 하나의 특수 문자를 포함해야 합니다.")
     private String password;
 
+    private String passwordConfirm;
+
+    private String phoneNumber;
+
+    private Long verification;
 
 }

@@ -9,12 +9,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class BoardResponseDTO {
     private Long userId;
+    private String title;
     private String comment;
-    private String emotionTag;
+    private String category;
 
     public BoardResponseDTO(Board board) {
+        this.title = board.getTitle();
         this.userId = board.getUser().getId();
         this.comment = board.getContent();
-        this.emotionTag = board.getEmotionTag();
+        this.category = board.getCategory();
     }
 }

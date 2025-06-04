@@ -5,7 +5,7 @@ import com.bigpicture.moonrabbit.domain.user.entity.User;
 import jakarta.persistence.*;
 
 @Entity
-public class Like {
+public class Likes {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

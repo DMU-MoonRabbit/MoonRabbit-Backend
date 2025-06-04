@@ -3,14 +3,12 @@ package com.bigpicture.moonrabbit.domain.answer.controller;
 import com.bigpicture.moonrabbit.domain.answer.dto.AnswerRequestDTO;
 import com.bigpicture.moonrabbit.domain.answer.dto.AnswerResponseDTO;
 import com.bigpicture.moonrabbit.domain.answer.service.AnswerService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,11 +16,26 @@ import org.springframework.web.bind.annotation.RestController;
 public class AnswerController {
     private final AnswerService answerService;
 
+
     @PostMapping("/save")
+    @Operation(summary = "댓글 생성", description = "사용자의 ID, 게시글의 ID를 입력받고 댓글 내용 생성")
     public ResponseEntity<AnswerResponseDTO> createAnswer(@RequestBody AnswerRequestDTO answerDTO, Long userId, Long boardId) {
         AnswerResponseDTO answerResponseDTO = answerService.save(answerDTO, userId, boardId);
         return new ResponseEntity<>(answerResponseDTO, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "댓글 수정", description = "댓글 ID와 사용자의 ID를 입력받아 댓글 내용 수정")
+    @PatchMapping("/edit/{id}")
+    public ResponseEntity<AnswerResponseDTO> updateAnswer(@PathVariable Long id,@RequestBody AnswerRequestDTO answerDTO, Long userId) {
+        AnswerResponseDTO answerResponseDTO = answerService.update(answerDTO, userId, id);
+        return new ResponseEntity<>(answerResponseDTO, HttpStatus.OK);
+    }
+
+    @Operation(summary = "댓글 삭제", description = "댓글 ID와 사용자의 ID를 입력받아 댓글 삭제")
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<AnswerResponseDTO> deleteAnswer(@PathVariable Long id,@RequestParam Long userId) {
+        AnswerResponseDTO answerResponseDTO = answerService.delete(id, userId);
+        return new ResponseEntity<>(answerResponseDTO, HttpStatus.OK);
+    }
 
 }
