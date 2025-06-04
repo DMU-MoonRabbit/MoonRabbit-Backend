@@ -52,6 +52,7 @@ dependencies {
 
 	// MySQL 드라이버
 	runtimeOnly 'com.mysql:mysql-connector-j'
+	implementation 'com.mysql:mysql-connector-j:8.2.0'
 
 	// 테스트 관련
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
