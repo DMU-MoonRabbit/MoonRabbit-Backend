@@ -1,5 +1,8 @@
 package com.bigpicture.moonrabbit.domain.user.service;
 
+import com.bigpicture.moonrabbit.domain.sms.entity.Sms;
+import com.bigpicture.moonrabbit.domain.sms.repository.SmsRepository;
+import com.bigpicture.moonrabbit.domain.sms.service.SmsService;
 import com.bigpicture.moonrabbit.domain.user.dto.UserRequestDTO;
 import com.bigpicture.moonrabbit.domain.user.dto.UserResponseDTO;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
@@ -21,7 +24,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder; // 비밀번호 암호화 확인용
     private final JwtGenerator jwtGenerator; // JWT 생성기
-
+    private final SmsService smsService;
+    private final SmsRepository smsRepository;
     // 유저 저장
     public UserResponseDTO saveUser(UserRequestDTO userRequestDTO) {
         Optional<User> existingUser = userRepository.findByEmail(userRequestDTO.getEmail());
@@ -31,6 +35,15 @@ public class UserService {
         if (!Objects.equals(userRequestDTO.getPassword(), userRequestDTO.getPasswordConfirm())) {
             throw new CustomException(ErrorCode.PASSWORD_COFIRM_ERROR);
         }
+
+        // SMS 인증 검증 추가
+        Sms sms = smsRepository.findByPhone(userRequestDTO.getPhoneNum());
+        if (sms == null || !sms.getCertification().equals(userRequestDTO.getVerification())) {
+            throw new CustomException(ErrorCode.SMS_CERTIFICATION_FAILED);  // 새로운 에러코드 정의 필요
+        }
+
+        // SMS 인증 성공 시 DB에서 인증정보 삭제
+        smsRepository.delete(sms);
         User user = new User();
         user.setEmail(userRequestDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));

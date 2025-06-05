@@ -22,7 +22,10 @@ public enum ErrorCode {
 
     // 서버 오류
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S001", "서버 오류가 발생했습니다."),
-    WRONG_ACCESS(HttpStatus.BAD_REQUEST, "S002" , "잘못된 접근입니다." );
+    WRONG_ACCESS(HttpStatus.BAD_REQUEST, "S002" , "잘못된 접근입니다." ),
+
+    // SMS 관련 에러
+    SMS_CERTIFICATION_FAILED(HttpStatus.BAD_REQUEST, "P003" , "인증 에러가 발생했습니다." ),;
 
     private final HttpStatus status;
     private final String code;
