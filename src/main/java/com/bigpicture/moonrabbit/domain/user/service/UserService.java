@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.bigpicture.moonrabbit.global.exception.CustomException;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -26,6 +27,9 @@ public class UserService {
         Optional<User> existingUser = userRepository.findByEmail(userRequestDTO.getEmail());
         if (existingUser.isPresent()) {
             throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
+        }
+        if (!Objects.equals(userRequestDTO.getPassword(), userRequestDTO.getPasswordConfirm())) {
+            throw new CustomException(ErrorCode.PASSWORD_COFIRM_ERROR);
         }
         User user = new User();
         user.setEmail(userRequestDTO.getEmail());

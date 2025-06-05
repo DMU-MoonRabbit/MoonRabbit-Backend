@@ -31,4 +31,25 @@ public class AnswerService {
 
         return new AnswerResponseDTO(savedAnswer);
     }
+
+    public AnswerResponseDTO update(AnswerRequestDTO answerDTO, Long userId, Long answerId) {
+        Answer answer = answerRepository.findById(answerId).orElseThrow(() -> new CustomException(ErrorCode.ANSWER_NOT_FOUND));
+        answer.setContent(answerDTO.getContent());
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        if(user.getId() != answer.getUser().getId()) {
+            throw new CustomException(ErrorCode.USER_INCORRECT);
+        }
+        answer.setUser(user);
+        Answer savedAnswer = answerRepository.save(answer);
+        return new AnswerResponseDTO(savedAnswer);
+    }
+    public AnswerResponseDTO delete(Long answerId, Long userId) {
+        Answer deletedAnswer = answerRepository.findById(answerId).orElseThrow(() -> new CustomException(ErrorCode.ANSWER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        if (user.getId() != deletedAnswer.getBoard().getUser().getId()) {
+            throw new CustomException(ErrorCode.USER_INCORRECT);
+        }
+        answerRepository.delete(deletedAnswer);
+        return new AnswerResponseDTO(deletedAnswer);
+    }
 }
