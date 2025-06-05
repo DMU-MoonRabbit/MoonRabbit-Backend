@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,14 +23,14 @@ public class SmsController {
 
     @Operation(summary = "SMS 발송", description = "전화번호를 입력받아 SMS 발송")
     @PostMapping("/send")
-    public ResponseEntity<SmsResponseDTO> sendSms(@Valid SmsRequestDTO smsRequestDTO) {
+    public ResponseEntity<SmsResponseDTO> sendSms(@Valid @RequestBody SmsRequestDTO smsRequestDTO) {
         SmsResponseDTO smsResponseDTO = smsService.sendSms(smsRequestDTO);
         return new ResponseEntity<>(smsResponseDTO, HttpStatus.OK);
     }
 
     @PostMapping("/check")
     @Operation(summary = "SMS 검증 테스트", description = "전화번호, 인증번호를 입력받아 인증번호 검사")
-    public ResponseEntity<SmsResponseDTO> checkSms(@Valid SmsCheckDTO smsCheckDTO) {
+    public ResponseEntity<SmsResponseDTO> checkSms(@Valid @RequestBody SmsCheckDTO smsCheckDTO) {
         SmsResponseDTO smsResponseDTO = smsService.checkNum(smsCheckDTO);
         return new ResponseEntity<>(smsResponseDTO, HttpStatus.OK);
     }

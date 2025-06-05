@@ -28,13 +28,16 @@ public class SmsService {
         sms.setPhone(phoneNum);
         smsRepository.deleteByPhone(smsRequestDTO.getPhoneNum());
         //6자리 랜덤 번호
-        String certification = Integer.toString((int)(Math.random()* (999999 - 100000 + 1)) + 100000);
+        String certification = generateCertificationCode();
         sms.setCertification(certification);
         smsRepository.save(sms);
         smsCertificationUtil.sendSms(phoneNum, certification);
         smsResponseDTO.setMessage("인증번호가 발송되었습니다.");
         smsResponseDTO.setSuccess(true);
         return smsResponseDTO;
+    }
+    public String generateCertificationCode() {
+        return Integer.toString((int)(Math.random()* (999999 - 100000 + 1)) + 100000);
     }
 
     public SmsResponseDTO checkNum(@Valid SmsCheckDTO smsCheckDTO) {
@@ -43,7 +46,7 @@ public class SmsService {
         if(sms == null) {
             smsResponseDTO.setSuccess(false);
             smsResponseDTO.setMessage("인증 요청 기록이 없습니다.");
-        }else if (sms.getCertification().equals(smsCheckDTO.getCertificate())) {
+        }else if (sms.getCertification().equals(smsCheckDTO.getCertification())) {
             smsResponseDTO.setSuccess(true);
             smsResponseDTO.setMessage("인증에 성공했습니다.");
         }

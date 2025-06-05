@@ -1,5 +1,6 @@
 package com.bigpicture.moonrabbit.domain.sms.entity;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,6 +15,7 @@ public class Sms {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
 
     private String phone;
 
