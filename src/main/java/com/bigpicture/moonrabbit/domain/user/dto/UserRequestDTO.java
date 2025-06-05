@@ -1,6 +1,7 @@
 package com.bigpicture.moonrabbit.domain.user.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 
@@ -18,8 +19,9 @@ public class UserRequestDTO {
 
     private String passwordConfirm;
 
-    private String phoneNumber;
+    @NotEmpty(message = "휴대폰 번호를 입력해주세요")
+    private String phoneNum;
 
-    private Long verification;
+    private String verification;
 
 }
