@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/boards")
@@ -39,6 +41,17 @@ public class BoardController {
         return new ResponseEntity<>(responseDTO ,HttpStatus.OK);
     }
 
+    @Operation(summary = "게시글 조회", description = "모든 게시글 조회")
+    @GetMapping("/list")
+    public ResponseEntity<List<BoardResponseDTO>> listBoards() {
+        List<BoardResponseDTO> responseDTO = boardService.select();
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
 
-
+    @Operation(summary = "특정 게시글 조회", description = "게시글의 ID를 받아 특정 게시글 조회")
+    @GetMapping("/list/{id}")
+    public ResponseEntity<BoardResponseDTO> listBoards(@PathVariable Long id) {
+        BoardResponseDTO responseDTO = boardService.selectOne(id);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
 }

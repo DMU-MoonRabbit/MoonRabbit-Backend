@@ -13,7 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +56,16 @@ public class BoardService {
         }
         boardRepository.delete(board);
 
+        return new BoardResponseDTO(board);
+    }
+
+    public List<BoardResponseDTO> select() {
+        return boardRepository.findAll().stream().map(board -> new BoardResponseDTO(board)).collect(Collectors.toList());
+    }
+
+    public BoardResponseDTO selectOne(Long id) {
+        Board board = boardRepository.findWithCommentsById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
         return new BoardResponseDTO(board);
     }
 }
