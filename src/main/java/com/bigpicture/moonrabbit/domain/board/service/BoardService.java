@@ -38,6 +38,7 @@ public class BoardService {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
         board.setTitle(boardDTO.getTitle());
         board.setContent(boardDTO.getContent());
+        board.setCategory(boardDTO.getCategory());
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         if(user.getId() != board.getUser().getId()) {
             throw new CustomException(ErrorCode.USER_INCORRECT);
