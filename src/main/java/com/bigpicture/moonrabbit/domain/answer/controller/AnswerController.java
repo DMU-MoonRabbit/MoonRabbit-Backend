@@ -16,6 +16,11 @@ import org.springframework.web.bind.annotation.*;
 public class AnswerController {
     private final AnswerService answerService;
 
+    @GetMapping("/save")
+    public String save() {
+        return "/save";
+    }
+
 
     @PostMapping("/save")
     @Operation(summary = "댓글 생성", description = "사용자의 ID, 게시글의 ID를 입력받고 댓글 내용 생성")

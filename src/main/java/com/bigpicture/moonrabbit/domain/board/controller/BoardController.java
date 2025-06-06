@@ -19,6 +19,13 @@ import java.util.List;
 @RequestMapping("api/boards")
 public class BoardController {
     private final BoardService boardService;
+
+    @GetMapping("/save")
+    public String save() {
+        return "/save";
+    }
+
+
     
     @Operation(summary = "게시글 생성", description = "제목, 내용, 카테고리를 입력받아 게시글 생성")
     @PostMapping("/save")

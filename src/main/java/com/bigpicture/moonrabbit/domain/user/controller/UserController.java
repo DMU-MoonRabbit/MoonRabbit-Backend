@@ -22,11 +22,31 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
+    @GetMapping("/login")
+    public String login() {
+        return "/login";
+    }
+
+    @GetMapping("/register")
+    public String register() {
+        return "/register";
+    }
+
+    @GetMapping("/profile")
+    public String profile() {
+        return "/profile";
+    }
+
+    @GetMapping("/email")
+    public String email() {
+        return "/email";
+    }
 
     // 유저 저장
     @Operation(summary = "유저 생성", description = "이메일, 닉네임, 비밀번호, 비밀번호 확인, 전화번호, 전화번호 인증 정보로 유저를 생성")
     @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserRequestDTO userRequestDTO) {
+
         UserResponseDTO responseDTO = userService.saveUser(userRequestDTO);
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
