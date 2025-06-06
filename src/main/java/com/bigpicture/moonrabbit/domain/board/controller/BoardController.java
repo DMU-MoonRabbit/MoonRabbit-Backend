@@ -24,10 +24,17 @@ import java.util.List;
 public class BoardController {
     private final BoardService boardService;
     private final UserService userService;
-    
+
+    @GetMapping("/save")
+    public String save() {
+        return "/save";
+    }
+
+
     @Operation(summary = "게시글 생성", description = "제목, 내용, 카테고리를 입력받아 게시글 생성")
     @PostMapping("/save")
     public ResponseEntity<BoardResponseDTO> createBoard(@Valid @RequestBody BoardRequestDTO boardDTO) {
+
         // 인증된 사용자 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();  // ← subject(email)가 들어 있음
