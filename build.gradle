@@ -5,7 +5,7 @@ plugins {
 
 }
 
-group = 'com.bigpicture'
+group = 'com.curpick'
 version = '0.0.1-SNAPSHOT'
 
 java {
