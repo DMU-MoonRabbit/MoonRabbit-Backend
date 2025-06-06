@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class BoardResponseDTO {
     private Long userId;
     private String title;
-    private String comment;
+    private String content;
     private String category;
     private List<AnswerResponseDTO> answers;
 
@@ -23,7 +23,7 @@ public class BoardResponseDTO {
     public BoardResponseDTO(Board board) {
         this.title = board.getTitle();
         this.userId = board.getUser().getId();
-        this.comment = board.getContent();
+        this.content = board.getContent();
         this.category = board.getCategory();
         this.answers = board.getAnswers().stream()
                 .map(AnswerResponseDTO::new)

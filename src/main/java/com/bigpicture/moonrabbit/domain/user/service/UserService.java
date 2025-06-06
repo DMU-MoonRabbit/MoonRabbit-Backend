@@ -17,6 +17,7 @@ import com.bigpicture.moonrabbit.global.exception.CustomException;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -24,8 +25,15 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder; // 비밀번호 암호화 확인용
     private final JwtGenerator jwtGenerator; // JWT 생성기
-    private final SmsService smsService;
     private final SmsRepository smsRepository;
+    private static final String[] ADJECTIVES = {
+            "행복한", "용감한", "느긋한", "귀여운", "기발한", "지혜로운", "빛나는", "엉뚱한", "차분한"
+    };
+
+    private static final String[] NOUNS = {
+            "토끼", "호랑이", "고양이", "사자", "판다", "부엉이", "돌고래", "햄스터", "고슴도치"
+    };
+
     // 유저 저장
     public UserResponseDTO saveUser(UserRequestDTO userRequestDTO) {
         Optional<User> existingUser = userRepository.findByEmail(userRequestDTO.getEmail());
@@ -47,7 +55,10 @@ public class UserService {
         User user = new User();
         user.setEmail(userRequestDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
-        user.setNickname(userRequestDTO.getNickname());
+        if(userRequestDTO.getNickname() == null) {
+            user.setNickname(generateNickname());
+        }
+
         User savedUser = userRepository.save(user);
 
 
@@ -73,5 +84,19 @@ public class UserService {
 
         // 로그인 성공시, 이메일과 권한정보를 같이 넘김
         return jwtGenerator.generateToken(user.getEmail(), user.getRole());
+    }
+
+    // 랜덤 닉네임 생성
+    public static String generateNickname() {
+        Random random = new Random();
+        String adjective = ADJECTIVES[random.nextInt(ADJECTIVES.length)];
+        String noun = NOUNS[random.nextInt(NOUNS.length)];
+        return adjective + noun;
+    }
+
+    public Long getUserIdByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        return user.getId();
     }
 }

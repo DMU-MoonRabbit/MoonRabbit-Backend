@@ -15,5 +15,6 @@ public class SmsCheckDTO {
 
     @Schema(description = "전화번호", example = "01012345678")
     private String phoneNum;
+    @Schema(description = "인증번호", example = "123456")
     private String certification;
 }
