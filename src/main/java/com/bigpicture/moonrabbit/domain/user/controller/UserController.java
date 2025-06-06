@@ -32,11 +32,6 @@ public class UserController {
         return "/register";
     }
 
-    @GetMapping("/profile")
-    public String profile() {
-        return "/profile";
-    }
-
     @GetMapping("/email")
     public String email() {
         return "/email";
