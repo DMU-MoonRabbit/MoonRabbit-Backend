@@ -13,6 +13,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/answer")
@@ -26,8 +28,9 @@ public class AnswerController {
     }
 
     @PostMapping("/save")
-    @Operation(summary = "댓글 생성", description = "사용자의 ID, 게시글의 ID를 입력받고 댓글 내용 생성")
-    public ResponseEntity<AnswerResponseDTO> createAnswer(@RequestBody AnswerRequestDTO answerDTO, Long boardId) {
+    @Operation(summary = "댓글 생성", description = "사용자의 ID, 게시글의 ID를 입력받고 댓글 내용 생성 (parentId가 있을 경우 대댓글)")
+    public ResponseEntity<AnswerResponseDTO> createAnswer(@RequestBody AnswerRequestDTO answerDTO,
+                                                          @RequestParam Long boardId) {
         // 인증된 사용자 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();  // ← subject(email)가 들어 있음
@@ -62,6 +65,13 @@ public class AnswerController {
         Long userId = userService.getUserIdByEmail(email);
         AnswerResponseDTO answerResponseDTO = answerService.delete(id, userId);
         return new ResponseEntity<>(answerResponseDTO, HttpStatus.OK);
+    }
+
+    @Operation(summary = "게시글 댓글 조회", description = "게시글 ID로 댓글 목록 조회 (닉네임, 프로필, 부모ID 포함)")
+    @GetMapping("/board/{boardId}")
+    public ResponseEntity<List<AnswerResponseDTO>> getAnswersByBoard(@PathVariable Long boardId) {
+        List<AnswerResponseDTO> answers = answerService.getAnswersByBoard(boardId);
+        return new ResponseEntity<>(answers, HttpStatus.OK);
     }
 
 }
