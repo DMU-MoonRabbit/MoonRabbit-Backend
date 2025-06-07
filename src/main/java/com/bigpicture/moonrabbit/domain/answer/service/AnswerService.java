@@ -13,6 +13,9 @@ import com.bigpicture.moonrabbit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class AnswerService {
@@ -70,5 +73,14 @@ public class AnswerService {
 
         answerRepository.delete(answer);
         return new AnswerResponseDTO(answer);
+    }
+
+    public List<AnswerResponseDTO> getAnswersByBoard(Long boardId) {
+        List<Answer> answers = answerRepository.findByBoardId(boardId);
+
+        // 기본 정렬이 필요하다면 정렬 추가 (예: 최신순 or 부모-자식 순)
+        return answers.stream()
+                .map(AnswerResponseDTO::new)
+                .collect(Collectors.toList());
     }
 }
