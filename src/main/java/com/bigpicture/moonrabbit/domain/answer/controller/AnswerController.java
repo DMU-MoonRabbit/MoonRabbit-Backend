@@ -26,8 +26,9 @@ public class AnswerController {
     }
 
     @PostMapping("/save")
-    @Operation(summary = "댓글 생성", description = "사용자의 ID, 게시글의 ID를 입력받고 댓글 내용 생성")
-    public ResponseEntity<AnswerResponseDTO> createAnswer(@RequestBody AnswerRequestDTO answerDTO, Long boardId) {
+    @Operation(summary = "댓글 생성", description = "사용자의 ID, 게시글의 ID를 입력받고 댓글 내용 생성 (parentId가 있을 경우 대댓글)")
+    public ResponseEntity<AnswerResponseDTO> createAnswer(@RequestBody AnswerRequestDTO answerDTO,
+                                                          @RequestParam Long boardId) {
         // 인증된 사용자 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();  // ← subject(email)가 들어 있음
