@@ -25,7 +25,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig {
-
     private final JwtProvider jwtTokenProvider;
     private final OAuth2LoginSuccessHandler oAuth2SuccessHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
@@ -47,7 +46,10 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
                                 "/webjars/**",
-                                "/api/**"
+                                "/api/**",
+                                "/assistant/**",
+                                "/streamingAssistant",
+                                "/oauth2/authorization/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -64,7 +66,6 @@ public class SecurityConfig {
 
         return http.build();
     }
-
     // CORS 설정 Bean
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
