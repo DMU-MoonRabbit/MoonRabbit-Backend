@@ -12,6 +12,11 @@ import com.bigpicture.moonrabbit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 import java.util.Optional;
@@ -61,12 +66,20 @@ public class BoardService {
     }
 
     public List<BoardResponseDTO> select() {
-        return boardRepository.findAll().stream().map(board -> new BoardResponseDTO(board)).collect(Collectors.toList());
+        return boardRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"))
+                .stream()
+                .map(BoardResponseDTO::new)
+                .collect(Collectors.toList());
     }
 
     public BoardResponseDTO selectOne(Long id) {
         Board board = boardRepository.findWithCommentsById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
         return new BoardResponseDTO(board);
+    }
+
+    public Page<BoardResponseDTO> selectPaged(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return boardRepository.findAll(pageable).map(BoardResponseDTO::new);
     }
 }

@@ -9,6 +9,7 @@ import com.bigpicture.moonrabbit.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -72,11 +73,14 @@ public class BoardController {
         return new ResponseEntity<>(responseDTO ,HttpStatus.OK);
     }
 
-    @Operation(summary = "게시글 조회", description = "모든 게시글 조회")
+    @Operation(summary = "게시글 페이징 조회", description = "게시글을 페이지 단위로 최신순 조회")
     @GetMapping("/list")
-    public ResponseEntity<List<BoardResponseDTO>> listBoards() {
-        List<BoardResponseDTO> responseDTO = boardService.select();
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    public ResponseEntity<Page<BoardResponseDTO>> listBoardsPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size
+    ) {
+        Page<BoardResponseDTO> pagedResult = boardService.selectPaged(page, size);
+        return new ResponseEntity<>(pagedResult, HttpStatus.OK);
     }
 
     @Operation(summary = "특정 게시글 조회", description = "게시글의 ID를 받아 특정 게시글 조회")

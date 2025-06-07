@@ -48,7 +48,8 @@ public class SecurityConfig {
                                 "/webjars/**",
                                 "/api/**",
                                 "/assistant/**",
-                                "/streamingAssistant"
+                                "/streamingAssistant",
+                                "/oauth2/authorization/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

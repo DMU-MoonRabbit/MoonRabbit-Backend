@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 @Getter
 @NoArgsConstructor
 public class BoardResponseDTO {
+    private Long boardId;
     private Long userId;
     private String title;
     private String content;
@@ -22,6 +23,7 @@ public class BoardResponseDTO {
 
     public BoardResponseDTO(Board board) {
         this.title = board.getTitle();
+        this.boardId = board.getId();
         this.userId = board.getUser().getId();
         this.content = board.getContent();
         this.category = board.getCategory();
