@@ -52,9 +52,7 @@ public class AssistantController {
     }
 
     @PostMapping("/society")
-    public String society(@RequestBody String message) {
-        return familyAssistant.chat(message);
-    }
+    public String society(@RequestBody String message) { return societyAssistant.chat(message); }
 
 
 
