@@ -35,12 +35,10 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         // JWT 토큰 생성
         String token = jwtProvider.createToken(email, role);
 
-        // JSON 형태로 응답
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        // 토큰을 쿼리 파라미터로 리다이렉트
+        String redirectUri = "http://moonrabbit-api.kro.kr/oauth2/redirect?token=" + URLEncoder.encode(token, StandardCharsets.UTF_8);
 
-        PrintWriter writer = response.getWriter();
-        writer.write("{\"token\": \"" + token + "\"}");
-        writer.flush();
+        log.info("OAuth2 login success. Redirecting to: {}", redirectUri);
+        response.sendRedirect(redirectUri);
     }
 }
