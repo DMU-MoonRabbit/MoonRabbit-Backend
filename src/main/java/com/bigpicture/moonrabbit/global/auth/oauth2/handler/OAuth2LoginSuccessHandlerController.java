@@ -10,9 +10,9 @@ import java.util.Map;
 
 @RestController
 public class OAuth2LoginSuccessHandlerController {
-    @GetMapping("/oauth2/redirect")
-    public ResponseEntity<?> handleRedirect(@RequestParam("token") String token) {
-        // token 받아서 처리
-        return ResponseEntity.ok(Map.of("token", token));
-    }
+//    @GetMapping("/oauth2/redirect")
+//    public ResponseEntity<?> handleRedirect(@RequestParam("token") String token) {
+//        // token 받아서 처리
+//        return ResponseEntity.ok(Map.of("token", token));
+//    }
 }
