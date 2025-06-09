@@ -6,7 +6,7 @@ services:
       context: .
     container_name: moonrabbit-app
     ports:
-      - "8080:8080"
+      - "3001:8080"
     env_file:
       - ./moonrabbit.env
     environment:
