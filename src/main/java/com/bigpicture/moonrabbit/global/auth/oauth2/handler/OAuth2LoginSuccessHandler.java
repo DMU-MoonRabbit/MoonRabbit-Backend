@@ -36,7 +36,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         String token = jwtProvider.createToken(email, role);
 
         // 토큰을 쿼리 파라미터로 리다이렉트
-        String redirectUri = "http://localhost:5173/loading?token=" + URLEncoder.encode(token, StandardCharsets.UTF_8);
+        String redirectUri = "https://moonrabbit-web.kro.kr/loading?token=" + URLEncoder.encode(token, StandardCharsets.UTF_8);
 
         log.info("OAuth2 login success. Redirecting to: {}", redirectUri);
         response.sendRedirect(redirectUri);
