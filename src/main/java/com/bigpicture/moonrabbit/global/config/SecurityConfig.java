@@ -51,7 +51,8 @@ public class SecurityConfig {
                                 "/api/**",
                                 "/assistant/**",
                                 "/streamingAssistant",
-                                "/oauth2/authorization/**"
+                                "/oauth2/authorization/**",
+                                "/loading/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
