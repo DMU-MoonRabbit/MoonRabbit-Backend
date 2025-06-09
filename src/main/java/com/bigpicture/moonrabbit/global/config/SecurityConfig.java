@@ -72,7 +72,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173")); // 개발용 도메인
+        config.setAllowedOrigins(List.of("http://localhost:5173",
+                                         "https://moonrabbit-api-kro.kr"
+        )); // 개발용 도메인
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true); // 필요한 경우 true 설정
