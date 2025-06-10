@@ -26,6 +26,7 @@ public class AssistantReply {
     private AssistantCategory category;
 
     @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String userMessage;
 
     @Lob
