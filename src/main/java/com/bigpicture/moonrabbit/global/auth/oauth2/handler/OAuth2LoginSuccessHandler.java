@@ -31,7 +31,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         String email = (String) oAuth2User.getAttributes().get("email");
         String role = oAuth2User.getAuthorities().iterator().next().getAuthority();
-        if (email == null) String email = (String) oAuth2User.getAttributes().get("email");
+        if (email == null) email = (String) oAuth2User.getAttributes().get("email");
         // JWT 토큰 생성
         String token = jwtProvider.createToken(email, role);
 
