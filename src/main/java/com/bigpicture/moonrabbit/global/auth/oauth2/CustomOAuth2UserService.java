@@ -40,9 +40,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             name = (String) profile.get("nickname");
             picture = (String) profile.get("profile_image_url");
 
-
-            log.info("[OAuth2-KAKAO] kakaoAccount: {}", kakaoAccount);  // 디버깅 로그
-            log.info("[OAuth2-KAKAO] profile: {}", profile);         
+            
+            
+            log.info("[OAuth2-KAKAO] attributes: {}", attributes);  // 최상위 attributes 로그         
             log.info("[OAuth2-KAKAO] id: {}", providerId);
             log.info("[OAuth2-KAKAO] email: {}", email);
             log.info("[OAuth2-KAKAO] nickname: {}", name);
