@@ -31,7 +31,12 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         String email = (String) oAuth2User.getAttributes().get("email");
         String role = oAuth2User.getAuthorities().iterator().next().getAuthority();
-        if (email == null) email = (String) oAuth2User.getAttributes().get("email");
+         if (email == null) {
+            Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
+        if (kakaoAccount != null) {
+            email = (String) kakaoAccount.get("email");  // 카카오에서 이메일을 가져오는 부분
+            }
+        }
         // JWT 토큰 생성
         String token = jwtProvider.createToken(email, role);
 
