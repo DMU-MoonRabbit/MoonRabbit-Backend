@@ -35,7 +35,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
             Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
 
-            providerId = String.valueOf(kakaoAccount.get("id"));
+            providerId = String.valueOf(attributes.get("id"));
             email = (String) kakaoAccount.get("email");
             name = (String) profile.get("nickname");
             picture = (String) profile.get("profile_image_url");
