@@ -28,7 +28,7 @@ public class User {
     @Column(nullable = false)
     private String email;
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private String password;
 
     private String provider = "common";
