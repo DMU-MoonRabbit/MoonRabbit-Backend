@@ -64,6 +64,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                         .profileImg(picture)
                         .provider(provider)
                         .providerId(providerId)
+                        .password("")
                         .role("USER")
                         .level(1)
                         .build())
