@@ -40,6 +40,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         log.info("OAuth2 login success. Redirecting to: {}", redirectUri);
         log.info("OAuth2 Email: {}", email);
+        log.info("OAuth2 User: ", oAuth2User);
         response.sendRedirect(redirectUri);
     }
 }
