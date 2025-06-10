@@ -39,6 +39,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         String redirectUri = "https://moonrabbit-web.kro.kr/loading?token=" + URLEncoder.encode(token, StandardCharsets.UTF_8);
 
         log.info("OAuth2 login success. Redirecting to: {}", redirectUri);
+        log.info("OAuth2 Email: {}", email);
         response.sendRedirect(redirectUri);
     }
 }
