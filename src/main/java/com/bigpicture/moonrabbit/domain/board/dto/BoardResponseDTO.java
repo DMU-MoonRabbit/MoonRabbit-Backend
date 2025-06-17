@@ -19,6 +19,8 @@ public class BoardResponseDTO {
     private String content;
     private String category;
     private List<AnswerResponseDTO> answers;
+    private String nickname;
+    private String profileImg;
 
 
     public BoardResponseDTO(Board board) {
@@ -30,5 +32,9 @@ public class BoardResponseDTO {
         this.answers = board.getAnswers().stream()
                 .map(AnswerResponseDTO::new)
                 .collect(Collectors.toList());
+        if (board.getUser() != null) {
+            this.nickname = board.getUser().getNickname();
+            this.profileImg = board.getUser().getProfileImg();
+        }
     }
 }
