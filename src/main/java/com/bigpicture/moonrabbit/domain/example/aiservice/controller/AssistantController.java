@@ -29,11 +29,12 @@ public class AssistantController {
 
     private final AssistantReplyService assistantReplyService;
     private final BoardRepository boardRepository;
+    private final EntireAssistant entireAssistant;
 
     @Operation(
             summary = "AI 답변 요청",
             description = "특정 게시글(boardId)에 대해 카테고리별 AI에게 본문을 보내고 답변을 생성\n" +
-                    "카테고리 영문 명: CAREER, FAMILY, LOVE, MENTAL, PERSONAL, SOCIETY"
+                    "카테고리 영문 명: CAREER, FAMILY, LOVE, MENTAL, PERSONAL, SOCIETY, ENTIRE"
     )
     @PostMapping("/{category}")
     public AssistantResponse handleAssistantReply(
@@ -50,6 +51,7 @@ public class AssistantController {
             case MENTAL -> reply = mentalAssistant.chat(request.getMessage());
             case PERSONAL -> reply = personalAssistant.chat(request.getMessage());
             case SOCIETY -> reply = societyAssistant.chat(request.getMessage());
+            case ENTIRE -> reply = entireAssistant.chat(request.getMessage());
             default -> throw new CustomException(ErrorCode.INVALID_ASSISTANT_CATEGORY);
         }
 

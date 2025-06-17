@@ -6,5 +6,6 @@ public enum AssistantCategory {
     LOVE,
     MENTAL,
     PERSONAL,
-    SOCIETY
+    SOCIETY,
+    ENTIRE
 }
