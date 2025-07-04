@@ -17,6 +17,7 @@ import com.bigpicture.moonrabbit.domain.sms.service.SmsService;
 import com.bigpicture.moonrabbit.domain.sms.service.SmsServiceImpl;
 import com.bigpicture.moonrabbit.domain.sms.util.SmsCertificationUtil;
 import com.bigpicture.moonrabbit.domain.user.repository.UserRepository;
+import com.bigpicture.moonrabbit.domain.user.service.UserService;
 import com.bigpicture.moonrabbit.domain.user.service.UserServiceImpl;
 import com.bigpicture.moonrabbit.global.auth.jwt.generator.JwtGenerator;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,7 @@ public class SpringConfig {
     private final PlaylistRepository playlistRepository;
 
     @Bean
-    public UserServiceImpl userService() {
+    public UserService userService() {
         return new UserServiceImpl(userRepository, passwordEncoder, jwtGenerator, smsRepository);
     }
 
