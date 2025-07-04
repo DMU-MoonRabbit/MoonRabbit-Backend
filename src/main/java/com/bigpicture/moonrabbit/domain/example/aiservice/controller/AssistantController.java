@@ -26,7 +26,6 @@ public class AssistantController {
     private final MentalAssistant mentalAssistant;
     private final PersonalAssistant personalAssistant;
     private final SocietyAssistant societyAssistant;
-
     private final AssistantReplyService assistantReplyService;
     private final BoardRepository boardRepository;
     private final EntireAssistant entireAssistant;
