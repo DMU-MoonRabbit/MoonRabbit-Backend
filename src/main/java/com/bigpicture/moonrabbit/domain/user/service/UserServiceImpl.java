@@ -73,11 +73,12 @@ public class UserServiceImpl implements UserService {
 
 
     // 이메일과 비밀번호로 로그인
-    @Override
     public JwtDTO login(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND)); // 사용자 존재 여부 확인
-
+        if(!(user.getProvider().equals("common"))) {
+            throw new CustomException(ErrorCode.USER_OTHER_PROVIDER);
+        }
         // 비밀번호 확인 (저장된 비밀번호와 입력받은 비밀번호 비교)
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new CustomException(ErrorCode.INVALID_PASSWORD); // 비밀번호 불일치 시 예외 발생
@@ -94,11 +95,12 @@ public class UserServiceImpl implements UserService {
         return user.getId();
     }
 
+    @Override
     // 랜덤 닉네임 생성
-    static String generateNickname() {
+    public String generateNickname() {
         Random random = new Random();
-        String adjective = UserServiceImpl.ADJECTIVES[random.nextInt(UserServiceImpl.ADJECTIVES.length)];
-        String noun = UserServiceImpl.NOUNS[random.nextInt(UserServiceImpl.NOUNS.length)];
+        String adjective = ADJECTIVES[random.nextInt(ADJECTIVES.length)];
+        String noun = NOUNS[random.nextInt(NOUNS.length)];
         return adjective + noun;
     }
 }

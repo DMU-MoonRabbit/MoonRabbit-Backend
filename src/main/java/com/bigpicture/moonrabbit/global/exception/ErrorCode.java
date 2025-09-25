@@ -12,7 +12,7 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U002", "해당 사용자를 찾을 수 없습니다."),
     PASSWORD_COFIRM_ERROR(HttpStatus.BAD_REQUEST, "U003", "입력한 비밀번호가 일치하지 않습니다."),
     USER_INCORRECT(HttpStatus.BAD_REQUEST, "U004", "작성자만 수정이 가능합니다."),
-
+    USER_OTHER_PROVIDER(HttpStatus.BAD_REQUEST, "U005", "이미 소셜 미디어로 연동하여 가입된 계정입니다."),
     ANSWER_NOT_FOUND(HttpStatus.NOT_FOUND, "A001", "해당 댓글을 찾을 수 없습니다."),
     // 게시글 관련 에러
     BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "B001", "해당 게시글을 찾을 수 없습니다."),

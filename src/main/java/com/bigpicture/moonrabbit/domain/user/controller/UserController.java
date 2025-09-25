@@ -83,4 +83,13 @@ public class UserController {
         User user = userService.getUserByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         return ResponseEntity.ok(new UserResponseDTO(user));
     }
+
+    // 사용자 정보 반환 (익명)
+    @GetMapping("/nicknames/random")
+    @Operation(summary = "랜덤 닉네임 생성 API", description = "로그인된 사용자의 정보를 불러오지만 닉네임을 랜덤닉네임으로 불러옴   ")
+    public ResponseEntity<UserResponseDTO> getRandomNickname() {
+        User user = userService.getUserByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+        user.setNickname(userService.generateNickname());
+        return ResponseEntity.ok(new UserResponseDTO(user));
+    }
 }
