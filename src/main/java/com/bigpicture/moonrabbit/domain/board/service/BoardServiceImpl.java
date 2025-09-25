@@ -103,25 +103,4 @@ public class BoardServiceImpl implements BoardService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         return boardRepository.findAll(pageable).map(BoardResponseDTO::new);
     }
-
-    @Transactional
-    public void selectAnswer(Long boardId, Long answerId, Long userId) {
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
-
-        // 글쓴이만 선택 가능
-        if (!board.getUser().getId().equals(userId)) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED);
-        }
-
-        Answer answer = answerRepository.findById(answerId)
-                .orElseThrow(() -> new CustomException(ErrorCode.ANSWER_NOT_FOUND));
-
-        if (answer.getBoard().getId() == boardId) {
-            throw new CustomException(ErrorCode.INVALID_ANSWER);
-        }
-
-        board.setSelectedAnswer(answer); // 선택된 댓글 저장
-        boardRepository.save(board);
-    }
 }
