@@ -103,4 +103,9 @@ public class UserServiceImpl implements UserService {
         String noun = NOUNS[random.nextInt(NOUNS.length)];
         return adjective + noun;
     }
+
+    @Override
+    public int givePoint(int count){
+        return count;
+    }
 }

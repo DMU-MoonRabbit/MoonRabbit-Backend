@@ -8,9 +8,11 @@ import com.bigpicture.moonrabbit.domain.board.entity.Board;
 import com.bigpicture.moonrabbit.domain.board.repository.BoardRepository;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
 import com.bigpicture.moonrabbit.domain.user.repository.UserRepository;
+import com.bigpicture.moonrabbit.domain.user.service.UserService;
 import com.bigpicture.moonrabbit.global.exception.CustomException;
 import com.bigpicture.moonrabbit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
@@ -22,6 +24,7 @@ public class AnswerServiceImpl implements AnswerService {
     private final AnswerRepository answerRepository;
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public AnswerResponseDTO save(AnswerRequestDTO answerDTO, Long userId, Long boardId) {
@@ -32,6 +35,8 @@ public class AnswerServiceImpl implements AnswerService {
 
         Answer answer = new Answer();
         answer.setContent(answerDTO.getContent());
+        // 댓글 작성 시 3점 지급
+        user.setPoint(user.getPoint()+userService.givePoint(3));
         answer.setUser(user);
         answer.setBoard(board);
 
@@ -42,7 +47,9 @@ public class AnswerServiceImpl implements AnswerService {
             answer.setParent(parent);
         }
 
+
         Answer savedAnswer = answerRepository.save(answer);
+
         return new AnswerResponseDTO(savedAnswer);
     }
 
@@ -74,6 +81,10 @@ public class AnswerServiceImpl implements AnswerService {
             throw new CustomException(ErrorCode.USER_INCORRECT);
         }
 
+        if(user.getPoint() < 3) {
+            // 댓글 삭제 시 3점 감소 3점보다 낮을 경우 0으로 설정
+            user.setPoint(0);
+        } else user.setPoint(user.getPoint() + userService.givePoint(-3));
         answerRepository.delete(answer);
         return new AnswerResponseDTO(answer);
     }
@@ -86,5 +97,31 @@ public class AnswerServiceImpl implements AnswerService {
         return answers.stream()
                 .map(AnswerResponseDTO::new)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public Board selectAnswer(Long boardId, Long answerId, Long userId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+
+        // 게시글 작성자 확인
+        if (!board.getUser().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_ACTION);
+        }
+
+        Answer answer = answerRepository.findById(answerId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ANSWER_NOT_FOUND));
+
+        // 게시글 작성자가 본인의 댓글을 선택하려고 하면 예외 처리
+        if (answer.getUser().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.CANNOT_SELECT_OWN_COMMENT);
+        }
+
+
+        // 선택 댓글 설정
+        board.setSelectedAnswer(answer);
+
+        return boardRepository.save(board);  // 선택 댓글 반영
     }
 }

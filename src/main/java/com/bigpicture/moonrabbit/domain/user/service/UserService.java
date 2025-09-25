@@ -20,5 +20,9 @@ public interface UserService {
     // 유저 아이디 이메일로 찾기
     Long getUserIdByEmail(String email);
 
+    // 랜덤 닉네임 생성
     String generateNickname();
+
+    // 포인트 증감 기능
+    int givePoint(int count);
 }

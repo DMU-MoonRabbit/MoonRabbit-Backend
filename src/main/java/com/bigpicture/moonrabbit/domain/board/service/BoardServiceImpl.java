@@ -1,5 +1,7 @@
 package com.bigpicture.moonrabbit.domain.board.service;
 
+import com.bigpicture.moonrabbit.domain.answer.entity.Answer;
+import com.bigpicture.moonrabbit.domain.answer.repository.AnswerRepository;
 import com.bigpicture.moonrabbit.domain.board.dto.BoardRequestDTO;
 import com.bigpicture.moonrabbit.domain.board.dto.BoardResponseDTO;
 import com.bigpicture.moonrabbit.domain.board.entity.Board;
@@ -14,8 +16,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -24,6 +28,7 @@ public class BoardServiceImpl implements BoardService {
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final AnswerRepository answerRepository;
 
     @Override
     public BoardResponseDTO createBoard(BoardRequestDTO boardDTO, Long userId) {
@@ -33,9 +38,15 @@ public class BoardServiceImpl implements BoardService {
         board.setCategory(boardDTO.getCategory());
         board.setAnonymous(boardDTO.isAnonymous());
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        if(boardDTO.isAnonymous()) {
-            user.setNickname(userService.generateNickname());
+        if (boardDTO.isAnonymous()) {
+            board.setAnonymous(true);
+            board.setAnonymousNickname(userService.generateNickname());
+        } else {
+            board.setAnonymous(false);
+            board.setAnonymousNickname(user.getNickname());
         }
+        // 게시글 작성 시 10점 지급
+        user.setPoint(user.getPoint()+userService.givePoint(10));
         board.setUser(user);
         Board savedBoard = boardRepository.save(board);
         return new BoardResponseDTO(savedBoard);
@@ -63,6 +74,10 @@ public class BoardServiceImpl implements BoardService {
         if(user.getId() != board.getUser().getId()) {
             throw new CustomException(ErrorCode.USER_INCORRECT);
         }
+        if(user.getPoint() < 10) {
+            // 게시글 작성 시 10점 감소 10점보다 낮을 경우 0점으로 조정
+            user.setPoint(0);
+        } else user.setPoint(user.getPoint() + userService.givePoint(-10));
         boardRepository.delete(board);
 
         return new BoardResponseDTO(board);
@@ -87,5 +102,26 @@ public class BoardServiceImpl implements BoardService {
     public Page<BoardResponseDTO> selectPaged(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         return boardRepository.findAll(pageable).map(BoardResponseDTO::new);
+    }
+
+    @Transactional
+    public void selectAnswer(Long boardId, Long answerId, Long userId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+
+        // 글쓴이만 선택 가능
+        if (!board.getUser().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+
+        Answer answer = answerRepository.findById(answerId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ANSWER_NOT_FOUND));
+
+        if (answer.getBoard().getId() == boardId) {
+            throw new CustomException(ErrorCode.INVALID_ANSWER);
+        }
+
+        board.setSelectedAnswer(answer); // 선택된 댓글 저장
+        boardRepository.save(board);
     }
 }

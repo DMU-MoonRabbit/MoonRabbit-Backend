@@ -2,6 +2,7 @@ package com.bigpicture.moonrabbit.domain.answer.service;
 
 import com.bigpicture.moonrabbit.domain.answer.dto.AnswerRequestDTO;
 import com.bigpicture.moonrabbit.domain.answer.dto.AnswerResponseDTO;
+import com.bigpicture.moonrabbit.domain.board.entity.Board;
 
 import java.util.List;
 
@@ -13,4 +14,6 @@ public interface AnswerService {
     AnswerResponseDTO delete(Long answerId, Long userId);
 
     List<AnswerResponseDTO> getAnswersByBoard(Long boardId);
+
+    Board selectAnswer(Long boardId, Long answerId, Long userId);
 }

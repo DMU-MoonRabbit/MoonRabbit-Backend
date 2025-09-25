@@ -32,12 +32,18 @@ public class Board {
     private String category;
     private int commentCount = 0;
     private boolean isAnonymous = false;
+    private String anonymousNickname;
     private String aiStyle; 
     private int reportCount = 0;
     private boolean isReported = false;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true )
     private List<Answer> answers = new ArrayList<>();
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "selected_answer_id")
+    private Answer selectedAnswer; // 글쓴이가 선택한 댓글
 
     @CreatedDate
     private LocalDateTime createdAt;

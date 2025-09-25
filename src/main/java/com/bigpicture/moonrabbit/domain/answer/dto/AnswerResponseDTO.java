@@ -12,11 +12,11 @@ public class AnswerResponseDTO {
     private LocalDateTime createdAt;
     private int likeCount;
     private int reportCount;
-
     private Long parentId;
     private Long userId;
     private String nickname;
     private String profileImg;
+    private boolean isSelected; // 선택 댓글 표시
 
     public AnswerResponseDTO(Answer answer) {
         this.id = answer.getId();
@@ -30,7 +30,10 @@ public class AnswerResponseDTO {
 
         // 작성자 정보
         this.userId = answer.getUser().getId();
-        this.nickname = answer.getUser().getNickname();
+        this.nickname = answer.getBoard().isAnonymous()
+                ? answer.getBoard().getAnonymousNickname()
+                : answer.getUser().getNickname();
         this.profileImg = answer.getUser().getProfileImg();
+        this.isSelected = answer.equals(answer.getBoard().getSelectedAnswer());
     }
 }
