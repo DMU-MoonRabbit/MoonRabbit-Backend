@@ -1,5 +1,6 @@
 package com.bigpicture.moonrabbit.domain.board.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -17,7 +18,9 @@ public class BoardRequestDTO {
     @Schema(description = "분야", example = "전체, 가족, 연인 ...")
     private String category;
 
+
     @Schema(description = "익명여부", example = "false")
+    @JsonProperty("isAnonymous")
     private boolean isAnonymous;
 
 }

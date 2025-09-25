@@ -19,4 +19,6 @@ public interface UserService {
 
     // 유저 아이디 이메일로 찾기
     Long getUserIdByEmail(String email);
+
+    String generateNickname();
 }

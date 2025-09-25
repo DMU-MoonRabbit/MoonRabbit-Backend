@@ -50,8 +50,8 @@ public class SpringConfig {
     }
 
     @Bean
-    public BoardService boardService() {
-        return new BoardServiceImpl(boardRepository, userRepository);
+    public BoardService boardService(UserService userService) {
+        return new BoardServiceImpl(boardRepository, userRepository, userService());
     }
 
     @Bean

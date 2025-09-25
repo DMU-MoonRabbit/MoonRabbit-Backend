@@ -6,6 +6,7 @@ import com.bigpicture.moonrabbit.domain.board.entity.Board;
 import com.bigpicture.moonrabbit.domain.board.repository.BoardRepository;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
 import com.bigpicture.moonrabbit.domain.user.repository.UserRepository;
+import com.bigpicture.moonrabbit.domain.user.service.UserService;
 import com.bigpicture.moonrabbit.global.exception.CustomException;
 import com.bigpicture.moonrabbit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class BoardServiceImpl implements BoardService {
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public BoardResponseDTO createBoard(BoardRequestDTO boardDTO, Long userId) {
@@ -31,6 +33,9 @@ public class BoardServiceImpl implements BoardService {
         board.setCategory(boardDTO.getCategory());
         board.setAnonymous(boardDTO.isAnonymous());
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        if(boardDTO.isAnonymous()) {
+            user.setNickname(userService.generateNickname());
+        }
         board.setUser(user);
         Board savedBoard = boardRepository.save(board);
         return new BoardResponseDTO(savedBoard);
