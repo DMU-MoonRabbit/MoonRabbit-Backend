@@ -2,6 +2,7 @@ package com.bigpicture.moonrabbit.domain.user.service;
 
 import com.bigpicture.moonrabbit.domain.sms.entity.Sms;
 import com.bigpicture.moonrabbit.domain.sms.repository.SmsRepository;
+import com.bigpicture.moonrabbit.domain.user.dto.UserRankingDTO;
 import com.bigpicture.moonrabbit.domain.user.dto.UserRequestDTO;
 import com.bigpicture.moonrabbit.domain.user.dto.UserResponseDTO;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
@@ -10,6 +11,9 @@ import com.bigpicture.moonrabbit.global.auth.jwt.dto.JwtDTO;
 import com.bigpicture.moonrabbit.global.auth.jwt.generator.JwtGenerator;
 import com.bigpicture.moonrabbit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.bigpicture.moonrabbit.global.exception.CustomException;
 
@@ -104,4 +108,21 @@ public class UserServiceImpl implements UserService {
         String noun = NOUNS[random.nextInt(NOUNS.length)];
         return adjective + noun;
     }
+
+    @Override
+    public Page<UserRankingDTO> getTotalPointRanking(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size); // 0-based 페이지
+        return userRepository.findAllByOrderByTotalPointDesc(pageable)
+                .map(UserRankingDTO::new); // 엔티티 → DTO 변환
+    }
+
+    @Override
+    // trustPoint 기준
+    public Page<UserRankingDTO> getTrustPointRanking(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return userRepository.findAllByOrderByTrustPointDesc(pageable)
+                .map(UserRankingDTO::new);
+    }
+
+
 }

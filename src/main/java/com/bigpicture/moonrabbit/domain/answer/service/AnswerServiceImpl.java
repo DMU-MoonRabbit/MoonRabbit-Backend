@@ -7,6 +7,7 @@ import com.bigpicture.moonrabbit.domain.answer.repository.AnswerRepository;
 import com.bigpicture.moonrabbit.domain.board.entity.Board;
 import com.bigpicture.moonrabbit.domain.board.repository.BoardRepository;
 import com.bigpicture.moonrabbit.domain.point.Point;
+import com.bigpicture.moonrabbit.domain.trust.Trust;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
 import com.bigpicture.moonrabbit.domain.user.repository.UserRepository;
 import com.bigpicture.moonrabbit.domain.user.service.UserService;
@@ -25,6 +26,7 @@ public class AnswerServiceImpl implements AnswerService {
     private final AnswerRepository answerRepository;
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public AnswerResponseDTO save(AnswerRequestDTO answerDTO, Long userId, Long boardId) {
@@ -35,8 +37,8 @@ public class AnswerServiceImpl implements AnswerService {
 
         Answer answer = new Answer();
         answer.setContent(answerDTO.getContent());
-        // 댓글 작성 시 3점 지급
-        user.setPoint(user.getPoint()+Point.CREATE_BOARD.getValue());
+        // 댓글 작성 시 5점 지급
+        user.changePoint(Point.CREATE_ANSWER.getValue());
         answer.setUser(user);
         answer.setBoard(board);
 
@@ -81,10 +83,7 @@ public class AnswerServiceImpl implements AnswerService {
             throw new CustomException(ErrorCode.USER_INCORRECT);
         }
 
-        if(user.getPoint() < 5) {
-            // 댓글 삭제 시 5점 감소 5점보다 낮을 경우 0으로 설정
-            user.setPoint(0);
-        } else user.setPoint(user.getPoint() + Point.DELETE_ANSWER.getValue());
+        user.changePoint(Point.DELETE_ANSWER.getValue());
         answerRepository.delete(answer);
         return new AnswerResponseDTO(answer);
     }
@@ -126,6 +125,12 @@ public class AnswerServiceImpl implements AnswerService {
 
         // 선택 댓글 설정
         board.setSelectedAnswer(answer);
+
+        // 댓글 작성자에게 포인트 지급 (신뢰도, 포인트)
+        User answerUser = answer.getUser();
+        answerUser.setTrustPoint(answerUser.getTrustPoint() + Trust.ANSWER_ACCEPTED.getValue());
+        answerUser.changePoint(Point.ANSWER_ACCEPTED.getValue());
+        userRepository.save(answerUser); // 변경 사항 저장
 
         return boardRepository.save(board);  // 선택 댓글 반영
     }

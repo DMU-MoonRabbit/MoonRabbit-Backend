@@ -8,7 +8,8 @@ public enum Point {
     DELETE_BOARD(-10),
     CREATE_ANSWER(5),
     DELETE_ANSWER(-5),
-    CREATE_DAILY_ANSWER(3);
+    CREATE_DAILY_ANSWER(3),
+    ANSWER_ACCEPTED(30);
 
     private final int value;
 

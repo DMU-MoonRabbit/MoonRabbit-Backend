@@ -1,9 +1,11 @@
 package com.bigpicture.moonrabbit.domain.user.service;
 
+import com.bigpicture.moonrabbit.domain.user.dto.UserRankingDTO;
 import com.bigpicture.moonrabbit.domain.user.dto.UserRequestDTO;
 import com.bigpicture.moonrabbit.domain.user.dto.UserResponseDTO;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
 import com.bigpicture.moonrabbit.global.auth.jwt.dto.JwtDTO;
+import org.springframework.data.domain.Page;
 
 import java.util.Random;
 
@@ -22,4 +24,8 @@ public interface UserService {
 
     // 랜덤 닉네임 생성
     String generateNickname();
+
+    Page<UserRankingDTO> getTotalPointRanking(int page, int size);
+
+    Page<UserRankingDTO> getTrustPointRanking(int page, int size);
 }

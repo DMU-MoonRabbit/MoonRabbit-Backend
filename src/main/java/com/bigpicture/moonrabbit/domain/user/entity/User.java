@@ -37,8 +37,9 @@ public class User {
     private String profileImg;
     private String role = ROLE_USER;
     private int level = 1;
-    private int exp = 0;
+    private int trustPoint = 0;
     private int point = 0;
+    private int totalPoint = 0;
     private boolean mentor = false;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -50,5 +51,23 @@ public class User {
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
+
+    public void changePoint(int delta) {
+        // 현재 포인트 + delta 계산 후 0 미만이면 0으로 설정
+        this.point = Math.max(this.point + delta, 0);
+
+        // delta가 양수든 음수든 누적 totalPoint는 그대로 증가 (삭제 시 음수여도 증가 X)
+        if (delta > 0) {
+            this.totalPoint += delta;
+        }
+
+        // 레벨 업데이트 (예: 1000점마다 레벨 1 증가)
+        this.level = calculateLevel(this.totalPoint);
+    }
+
+    // 누적 포인트 30점마다 1레벨
+    public int calculateLevel(int totalPoint) {
+        return totalPoint / 30 + 1;
+    }
 
 }
