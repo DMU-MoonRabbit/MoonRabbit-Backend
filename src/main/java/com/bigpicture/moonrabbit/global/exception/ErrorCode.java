@@ -24,6 +24,7 @@ public enum ErrorCode {
     UNAUTHORIZED_ACTION(HttpStatus.BAD_REQUEST,"A003","글쓴이만 가능합니다." ),
     CANNOT_SELECT_OWN_COMMENT(HttpStatus.BAD_REQUEST,"A004","본인의 답변을 채택할 수 없습니다."),
     ALREADY_SELECTED_ANSWER(HttpStatus.BAD_REQUEST,"A005","이미 채택된 답변이 존재합니다."),
+
     // AI 답변 관련 에러 추가
     AI_REPLY_NOT_FOUND(HttpStatus.NOT_FOUND, "AI001", "AI 답변을 찾을 수 없습니다."),
     INVALID_ASSISTANT_CATEGORY(HttpStatus.BAD_REQUEST, "AI002", "지원하지 않는 카테고리입니다."),
@@ -35,6 +36,10 @@ public enum ErrorCode {
     // 서버 오류
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S001", "서버 오류가 발생했습니다."),
     WRONG_ACCESS(HttpStatus.BAD_REQUEST, "S002", "잘못된 접근입니다."),
+
+    // 좋아요 관련 에러
+    DUPLICATE_LIKE(HttpStatus.BAD_REQUEST, "L001", "이미 좋아요를 눌렀습니다."),
+    ALREADY_LIKED_BOARD(HttpStatus.BAD_REQUEST, "L002" , "이미 북마크가 되어있는 고민입니다." ),
 
     // SMS 관련 에러
     SMS_CERTIFICATION_FAILED(HttpStatus.BAD_REQUEST, "P003", "인증 에러가 발생했습니다.");

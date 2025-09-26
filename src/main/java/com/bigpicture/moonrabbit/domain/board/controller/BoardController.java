@@ -100,6 +100,6 @@ public class BoardController {
         Long userId = userService.getUserIdByEmail(email);
 
         Board updatedBoard = answerService.selectAnswer(boardId, answerId, userId);
-        return ResponseEntity.ok(new BoardResponseDTO(updatedBoard));
+        return ResponseEntity.ok(new BoardResponseDTO(updatedBoard, userId));
     }
 }

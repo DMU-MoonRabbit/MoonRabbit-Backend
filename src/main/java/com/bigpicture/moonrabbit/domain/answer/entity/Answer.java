@@ -1,5 +1,6 @@
 package com.bigpicture.moonrabbit.domain.answer.entity;
 import com.bigpicture.moonrabbit.domain.board.entity.Board;
+import com.bigpicture.moonrabbit.domain.like.entity.Likes;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
 import lombok.*;
 import jakarta.persistence.*;
@@ -30,6 +31,10 @@ public class Answer {
     @JoinColumn(name = "board_id")
     private Board board;
 
+    @OneToMany(mappedBy = "answer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Likes> likes = new ArrayList<>();
+
+    // 좋아요 개수
     private int likeCount = 0;
 
     private String content;
@@ -46,4 +51,8 @@ public class Answer {
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Answer> children = new ArrayList<>();
+
+    public int getLikeCount() {
+        return likes.size();
+    }
 }

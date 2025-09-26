@@ -22,16 +22,18 @@ public class BoardResponseDTO {
     private String nickname;
     private String profileImg;
     private Long selectedAnswerId;
+    private int likeCount;
 
 
-    public BoardResponseDTO(Board board) {
+    public BoardResponseDTO(Board board, Long currentUserId) {
         this.title = board.getTitle();
         this.boardId = board.getId();
         this.userId = board.getUser().getId();
         this.content = board.getContent();
         this.category = board.getCategory();
+        this.likeCount = board.getLikeCount();
         this.answers = board.getAnswers().stream()
-                .map(AnswerResponseDTO::new)
+                .map(answer -> new AnswerResponseDTO(answer, currentUserId))
                 .collect(Collectors.toList());
         // 선택된 댓글이 있으면 ID 저장
         if (board.getSelectedAnswer() != null) {

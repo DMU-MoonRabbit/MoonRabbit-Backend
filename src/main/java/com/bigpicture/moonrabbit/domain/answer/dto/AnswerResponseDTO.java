@@ -18,7 +18,9 @@ public class AnswerResponseDTO {
     private String profileImg;
     private boolean isSelected; // 선택 댓글 표시
 
-    public AnswerResponseDTO(Answer answer) {
+    private boolean likedByMe;
+
+    public AnswerResponseDTO(Answer answer, Long currentUserId) {
         this.id = answer.getId();
         this.content = answer.getContent();
         this.createdAt = answer.getCreatedAt();
@@ -35,5 +37,7 @@ public class AnswerResponseDTO {
                 : answer.getUser().getNickname();
         this.profileImg = answer.getUser().getProfileImg();
         this.isSelected = answer.equals(answer.getBoard().getSelectedAnswer());
+        this.likedByMe = answer.getLikes().stream()
+                .anyMatch(like -> like.getUser().getId().equals(currentUserId));
     }
 }
