@@ -13,7 +13,7 @@ public interface AnswerService {
 
     AnswerResponseDTO delete(Long answerId, Long userId);
 
-    List<AnswerResponseDTO> getAnswersByBoard(Long boardId);
+    List<AnswerResponseDTO> getAnswersByBoard(Long boardId, Long currentUserId);
 
     Board selectAnswer(Long boardId, Long answerId, Long userId);
 }

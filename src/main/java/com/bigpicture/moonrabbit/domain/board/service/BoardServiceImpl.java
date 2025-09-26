@@ -17,6 +17,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -49,7 +51,7 @@ public class BoardServiceImpl implements BoardService {
         user.changePoint(Point.CREATE_BOARD.getValue());
         board.setUser(user);
         Board savedBoard = boardRepository.save(board);
-        return new BoardResponseDTO(savedBoard);
+        return new BoardResponseDTO(savedBoard, userId);
     }
     @Override
     public BoardResponseDTO updateBoard(Long boardId, BoardRequestDTO boardDTO, Long userId) {
@@ -63,7 +65,7 @@ public class BoardServiceImpl implements BoardService {
         }
         board.setUser(user);
         Board updatedBoard = boardRepository.save(board);
-        return new BoardResponseDTO(updatedBoard);
+        return new BoardResponseDTO(updatedBoard, userId);
     }
 
 
@@ -77,27 +79,42 @@ public class BoardServiceImpl implements BoardService {
         user.changePoint(Point.DELETE_BOARD.getValue());
         boardRepository.delete(board);
 
-        return new BoardResponseDTO(board);
+        return new BoardResponseDTO(board, userId);
     }
 
     @Override
     public List<BoardResponseDTO> select() {
+        // 인증된 사용자 정보 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Long currentUserId = userService.getUserIdByEmail(email);
+
         return boardRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"))
                 .stream()
-                .map(BoardResponseDTO::new)
+                .map(board -> new BoardResponseDTO(board, currentUserId))
                 .collect(Collectors.toList());
     }
 
     @Override
     public BoardResponseDTO selectOne(Long id) {
+        // 인증된 사용자 정보 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName(); // JWT 등에서 subject(email)
+        Long currentUserId = userService.getUserIdByEmail(email);
+
         Board board = boardRepository.findWithCommentsById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
-        return new BoardResponseDTO(board);
+        return new BoardResponseDTO(board, currentUserId);
     }
 
     @Override
     public Page<BoardResponseDTO> selectPaged(int page, int size) {
+        // 인증된 사용자 정보 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Long currentUserId = userService.getUserIdByEmail(email);
+
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        return boardRepository.findAll(pageable).map(BoardResponseDTO::new);
+        return boardRepository.findAll(pageable).map(board -> new BoardResponseDTO(board, currentUserId));
     }
 }

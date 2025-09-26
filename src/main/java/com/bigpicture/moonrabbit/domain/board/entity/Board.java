@@ -1,6 +1,7 @@
 package com.bigpicture.moonrabbit.domain.board.entity;
 
 import com.bigpicture.moonrabbit.domain.answer.entity.Answer;
+import com.bigpicture.moonrabbit.domain.boardLike.entity.BoardLike;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -36,6 +37,8 @@ public class Board {
     private String aiStyle; 
     private int reportCount = 0;
     private boolean isReported = false;
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BoardLike> likes = new ArrayList<>();
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true )
     private List<Answer> answers = new ArrayList<>();
@@ -47,5 +50,8 @@ public class Board {
 
     @CreatedDate
     private LocalDateTime createdAt;
-
+    // 총 좋아요 개수 getter
+    public int getLikeCount() {
+        return likes.size();
+    }
 }

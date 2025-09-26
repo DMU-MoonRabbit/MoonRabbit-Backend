@@ -52,7 +52,7 @@ public class AnswerServiceImpl implements AnswerService {
 
         Answer savedAnswer = answerRepository.save(answer);
 
-        return new AnswerResponseDTO(savedAnswer);
+        return new AnswerResponseDTO(savedAnswer, user.getId());
     }
 
     @Override
@@ -68,7 +68,7 @@ public class AnswerServiceImpl implements AnswerService {
 
         answer.setContent(answerDTO.getContent());
         Answer savedAnswer = answerRepository.save(answer);
-        return new AnswerResponseDTO(savedAnswer);
+        return new AnswerResponseDTO(savedAnswer, user.getId());
     }
 
     @Override
@@ -85,16 +85,16 @@ public class AnswerServiceImpl implements AnswerService {
 
         user.changePoint(Point.DELETE_ANSWER.getValue());
         answerRepository.delete(answer);
-        return new AnswerResponseDTO(answer);
+        return new AnswerResponseDTO(answer, user.getId());
     }
 
     @Override
-    public List<AnswerResponseDTO> getAnswersByBoard(Long boardId) {
+    public List<AnswerResponseDTO> getAnswersByBoard(Long boardId, Long currentUserId) {
         List<Answer> answers = answerRepository.findByBoardId(boardId);
 
         // 기본 정렬이 필요하다면 정렬 추가 (예: 최신순 or 부모-자식 순)
         return answers.stream()
-                .map(AnswerResponseDTO::new)
+                .map(answer -> new AnswerResponseDTO(answer, currentUserId))
                 .collect(Collectors.toList());
     }
 
