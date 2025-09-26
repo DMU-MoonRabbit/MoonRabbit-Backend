@@ -72,6 +72,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
+    @Override
     // 이메일과 비밀번호로 로그인
     public JwtDTO login(String email, String password) {
         User user = userRepository.findByEmail(email)

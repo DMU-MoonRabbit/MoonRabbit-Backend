@@ -21,6 +21,7 @@ public class BoardResponseDTO {
     private List<AnswerResponseDTO> answers;
     private String nickname;
     private String profileImg;
+    private Long selectedAnswerId;
 
 
     public BoardResponseDTO(Board board) {
@@ -32,8 +33,12 @@ public class BoardResponseDTO {
         this.answers = board.getAnswers().stream()
                 .map(AnswerResponseDTO::new)
                 .collect(Collectors.toList());
+        // 선택된 댓글이 있으면 ID 저장
+        if (board.getSelectedAnswer() != null) {
+            this.selectedAnswerId = board.getSelectedAnswer().getId();
+        }
         if (board.getUser() != null) {
-            this.nickname = board.getUser().getNickname();
+            this.nickname = board.isAnonymous() ? board.getAnonymousNickname() : board.getUser().getNickname();
             this.profileImg = board.getUser().getProfileImg();
         }
     }

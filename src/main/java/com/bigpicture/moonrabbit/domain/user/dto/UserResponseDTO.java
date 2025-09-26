@@ -12,11 +12,15 @@ public class UserResponseDTO {
     private String email;
     private String nickname;
     private String password;
+    private int level;
+    private int point;
 
     public UserResponseDTO(User user) {
         this.id = user.getId();
         this.email = user.getEmail();
         this.nickname = user.getNickname();
         this.password = user.getPassword();
+        this.level = user.getLevel();
+        this.point = user.getPoint();
     }
 }

@@ -20,7 +20,7 @@ public class BoardRequestDTO {
 
 
     @Schema(description = "익명여부", example = "false")
-    @JsonProperty("isAnonymous")
+    @JsonProperty("anonymous")
     private boolean isAnonymous;
 
 }

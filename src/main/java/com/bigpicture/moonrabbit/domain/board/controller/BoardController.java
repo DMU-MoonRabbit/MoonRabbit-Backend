@@ -1,7 +1,9 @@
 package com.bigpicture.moonrabbit.domain.board.controller;
 
+import com.bigpicture.moonrabbit.domain.answer.service.AnswerService;
 import com.bigpicture.moonrabbit.domain.board.dto.BoardRequestDTO;
 import com.bigpicture.moonrabbit.domain.board.dto.BoardResponseDTO;
+import com.bigpicture.moonrabbit.domain.board.entity.Board;
 import com.bigpicture.moonrabbit.domain.board.service.BoardService;
 import com.bigpicture.moonrabbit.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class BoardController {
     private final BoardService boardService;
     private final UserService userService;
+    private final AnswerService answerService;
 
     @GetMapping("/save")
     public String save() {
@@ -83,5 +86,20 @@ public class BoardController {
     public ResponseEntity<BoardResponseDTO> listBoards(@PathVariable Long id) {
         BoardResponseDTO responseDTO = boardService.selectOne(id);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    @Operation(summary = "댓글 채택", description = "글쓴이의 댓글을 제외한 댓글 채택 기능")
+    @PostMapping("/boards/{boardId}/select-answer/{answerId}")
+    public ResponseEntity<BoardResponseDTO> selectAnswer(
+            @PathVariable Long boardId,
+            @PathVariable Long answerId) {
+
+        // 인증된 사용자 정보
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Long userId = userService.getUserIdByEmail(email);
+
+        Board updatedBoard = answerService.selectAnswer(boardId, answerId, userId);
+        return ResponseEntity.ok(new BoardResponseDTO(updatedBoard));
     }
 }

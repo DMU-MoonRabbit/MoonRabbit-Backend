@@ -13,10 +13,17 @@ public enum ErrorCode {
     PASSWORD_COFIRM_ERROR(HttpStatus.BAD_REQUEST, "U003", "입력한 비밀번호가 일치하지 않습니다."),
     USER_INCORRECT(HttpStatus.BAD_REQUEST, "U004", "작성자만 수정이 가능합니다."),
     USER_OTHER_PROVIDER(HttpStatus.BAD_REQUEST, "U005", "이미 소셜 미디어로 연동하여 가입된 계정입니다."),
-    ANSWER_NOT_FOUND(HttpStatus.NOT_FOUND, "A001", "해당 댓글을 찾을 수 없습니다."),
+
     // 게시글 관련 에러
     BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "B001", "해당 게시글을 찾을 수 없습니다."),
+    UNAUTHORIZED(HttpStatus.BAD_REQUEST,"B002" ,"글쓴이만 채택이 가능합니다." ),
 
+    // 댓글 관련 에러
+    ANSWER_NOT_FOUND(HttpStatus.NOT_FOUND, "A001", "해당 댓글을 찾을 수 없습니다."),
+    INVALID_ANSWER(HttpStatus.BAD_REQUEST,"A002" ,"유효하지 않은 댓글입니다." ),
+    UNAUTHORIZED_ACTION(HttpStatus.BAD_REQUEST,"A003","글쓴이만 가능합니다." ),
+    CANNOT_SELECT_OWN_COMMENT(HttpStatus.BAD_REQUEST,"A004","본인의 답변을 채택할 수 없습니다."),
+    ALREADY_SELECTED_ANSWER(HttpStatus.BAD_REQUEST,"A005","이미 채택된 답변이 존재합니다."),
     // AI 답변 관련 에러 추가
     AI_REPLY_NOT_FOUND(HttpStatus.NOT_FOUND, "AI001", "AI 답변을 찾을 수 없습니다."),
     INVALID_ASSISTANT_CATEGORY(HttpStatus.BAD_REQUEST, "AI002", "지원하지 않는 카테고리입니다."),
