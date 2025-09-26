@@ -25,8 +25,6 @@ public interface UserService {
     // 랜덤 닉네임 생성
     String generateNickname();
 
-    int calculateLevel(int totalPoint);
-
     Page<UserRankingDTO> getTotalPointRanking(int page, int size);
 
     Page<UserRankingDTO> getTrustPointRanking(int page, int size);

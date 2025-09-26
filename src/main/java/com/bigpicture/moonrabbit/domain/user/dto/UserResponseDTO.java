@@ -14,6 +14,7 @@ public class UserResponseDTO {
     private String password;
     private int level;
     private int point;
+    private int trustPoint;
 
     public UserResponseDTO(User user) {
         this.id = user.getId();
@@ -22,5 +23,6 @@ public class UserResponseDTO {
         this.password = user.getPassword();
         this.level = user.getLevel();
         this.point = user.getPoint();
+        this.trustPoint = user.getTrustPoint();
     }
 }

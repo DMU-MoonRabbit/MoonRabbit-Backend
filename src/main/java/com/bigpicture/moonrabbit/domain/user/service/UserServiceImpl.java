@@ -110,12 +110,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    // 누적 포인트 30점마다 1레벨
-    public int calculateLevel(int totalPoint) {
-        return totalPoint / 30 + 1;
-    }
-
-    @Override
     public Page<UserRankingDTO> getTotalPointRanking(int page, int size) {
         Pageable pageable = PageRequest.of(page, size); // 0-based 페이지
         return userRepository.findAllByOrderByTotalPointDesc(pageable)
