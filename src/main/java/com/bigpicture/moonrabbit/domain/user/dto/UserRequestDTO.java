@@ -12,7 +12,7 @@ public class UserRequestDTO {
     @Schema(description = "이메일", example = "example@example.com")
     private String email;
 
-    @Schema(description = "초기 닉네임은 자동생성", example = "null")
+    @Schema(description = "초기 닉네임은 자동생성")
     private String nickname;
 
     @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{8,}$",

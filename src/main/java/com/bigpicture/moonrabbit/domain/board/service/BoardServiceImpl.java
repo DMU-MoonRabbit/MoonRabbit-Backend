@@ -6,6 +6,7 @@ import com.bigpicture.moonrabbit.domain.board.dto.BoardRequestDTO;
 import com.bigpicture.moonrabbit.domain.board.dto.BoardResponseDTO;
 import com.bigpicture.moonrabbit.domain.board.entity.Board;
 import com.bigpicture.moonrabbit.domain.board.repository.BoardRepository;
+import com.bigpicture.moonrabbit.domain.point.Point;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
 import com.bigpicture.moonrabbit.domain.user.repository.UserRepository;
 import com.bigpicture.moonrabbit.domain.user.service.UserService;
@@ -28,7 +29,6 @@ public class BoardServiceImpl implements BoardService {
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
     private final UserService userService;
-    private final AnswerRepository answerRepository;
 
     @Override
     public BoardResponseDTO createBoard(BoardRequestDTO boardDTO, Long userId) {
@@ -46,7 +46,7 @@ public class BoardServiceImpl implements BoardService {
             board.setAnonymousNickname(user.getNickname());
         }
         // 게시글 작성 시 10점 지급
-        user.setPoint(user.getPoint()+userService.givePoint(10));
+        user.setPoint(user.getPoint()+Point.CREATE_BOARD.getValue());
         board.setUser(user);
         Board savedBoard = boardRepository.save(board);
         return new BoardResponseDTO(savedBoard);
@@ -77,7 +77,7 @@ public class BoardServiceImpl implements BoardService {
         if(user.getPoint() < 10) {
             // 게시글 작성 시 10점 감소 10점보다 낮을 경우 0점으로 조정
             user.setPoint(0);
-        } else user.setPoint(user.getPoint() + userService.givePoint(-10));
+        } else user.setPoint(user.getPoint() + Point.DELETE_BOARD.getValue());
         boardRepository.delete(board);
 
         return new BoardResponseDTO(board);

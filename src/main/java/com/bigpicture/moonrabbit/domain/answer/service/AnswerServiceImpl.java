@@ -6,6 +6,7 @@ import com.bigpicture.moonrabbit.domain.answer.entity.Answer;
 import com.bigpicture.moonrabbit.domain.answer.repository.AnswerRepository;
 import com.bigpicture.moonrabbit.domain.board.entity.Board;
 import com.bigpicture.moonrabbit.domain.board.repository.BoardRepository;
+import com.bigpicture.moonrabbit.domain.point.Point;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
 import com.bigpicture.moonrabbit.domain.user.repository.UserRepository;
 import com.bigpicture.moonrabbit.domain.user.service.UserService;
@@ -24,7 +25,6 @@ public class AnswerServiceImpl implements AnswerService {
     private final AnswerRepository answerRepository;
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
-    private final UserService userService;
 
     @Override
     public AnswerResponseDTO save(AnswerRequestDTO answerDTO, Long userId, Long boardId) {
@@ -36,7 +36,7 @@ public class AnswerServiceImpl implements AnswerService {
         Answer answer = new Answer();
         answer.setContent(answerDTO.getContent());
         // 댓글 작성 시 3점 지급
-        user.setPoint(user.getPoint()+userService.givePoint(3));
+        user.setPoint(user.getPoint()+Point.CREATE_BOARD.getValue());
         answer.setUser(user);
         answer.setBoard(board);
 
@@ -81,10 +81,10 @@ public class AnswerServiceImpl implements AnswerService {
             throw new CustomException(ErrorCode.USER_INCORRECT);
         }
 
-        if(user.getPoint() < 3) {
-            // 댓글 삭제 시 3점 감소 3점보다 낮을 경우 0으로 설정
+        if(user.getPoint() < 5) {
+            // 댓글 삭제 시 5점 감소 5점보다 낮을 경우 0으로 설정
             user.setPoint(0);
-        } else user.setPoint(user.getPoint() + userService.givePoint(-3));
+        } else user.setPoint(user.getPoint() + Point.DELETE_ANSWER.getValue());
         answerRepository.delete(answer);
         return new AnswerResponseDTO(answer);
     }
@@ -108,6 +108,11 @@ public class AnswerServiceImpl implements AnswerService {
         // 게시글 작성자 확인
         if (!board.getUser().getId().equals(userId)) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_ACTION);
+        }
+
+        // 이미 선택된 댓글이 있으면 중복 채택 방지
+        if (board.getSelectedAnswer() != null) {
+            throw new CustomException(ErrorCode.ALREADY_SELECTED_ANSWER);
         }
 
         Answer answer = answerRepository.findById(answerId)

@@ -22,7 +22,4 @@ public interface UserService {
 
     // 랜덤 닉네임 생성
     String generateNickname();
-
-    // 포인트 증감 기능
-    int givePoint(int count);
 }

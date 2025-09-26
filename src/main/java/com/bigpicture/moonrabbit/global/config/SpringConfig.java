@@ -51,12 +51,12 @@ public class SpringConfig {
 
     @Bean
     public BoardService boardService(UserService userService) {
-        return new BoardServiceImpl(boardRepository, userRepository, userService(), answerRepository);
+        return new BoardServiceImpl(boardRepository, userRepository, userService());
     }
 
     @Bean
     public AnswerService answerService() {
-        return new AnswerServiceImpl(answerRepository, boardRepository, userRepository, userService());
+        return new AnswerServiceImpl(answerRepository, boardRepository, userRepository);
     }
 
     @Bean
