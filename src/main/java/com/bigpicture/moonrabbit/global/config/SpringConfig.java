@@ -56,7 +56,7 @@ public class SpringConfig {
 
     @Bean
     public AnswerService answerService() {
-        return new AnswerServiceImpl(answerRepository, boardRepository, userRepository);
+        return new AnswerServiceImpl(answerRepository, boardRepository, userRepository, userService());
     }
 
     @Bean

@@ -47,6 +47,8 @@ public class BoardServiceImpl implements BoardService {
         }
         // 게시글 작성 시 10점 지급
         user.setPoint(user.getPoint()+Point.CREATE_BOARD.getValue());
+        user.setTotalPoint(user.getTotalPoint()+Point.CREATE_BOARD.getValue());
+        user.setLevel(userService.calculateLevel(user.getTotalPoint()));
         board.setUser(user);
         Board savedBoard = boardRepository.save(board);
         return new BoardResponseDTO(savedBoard);
@@ -78,6 +80,8 @@ public class BoardServiceImpl implements BoardService {
             // 게시글 작성 시 10점 감소 10점보다 낮을 경우 0점으로 조정
             user.setPoint(0);
         } else user.setPoint(user.getPoint() + Point.DELETE_BOARD.getValue());
+        user.setTotalPoint(user.getTotalPoint()+Point.DELETE_BOARD.getValue());
+        user.setLevel(userService.calculateLevel(user.getTotalPoint()));
         boardRepository.delete(board);
 
         return new BoardResponseDTO(board);

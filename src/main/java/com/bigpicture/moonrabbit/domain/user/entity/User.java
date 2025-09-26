@@ -37,8 +37,9 @@ public class User {
     private String profileImg;
     private String role = ROLE_USER;
     private int level = 1;
-    private int exp = 0;
+    private int trustPoint = 0;
     private int point = 0;
+    private int totalPoint = 0;
     private boolean mentor = false;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
