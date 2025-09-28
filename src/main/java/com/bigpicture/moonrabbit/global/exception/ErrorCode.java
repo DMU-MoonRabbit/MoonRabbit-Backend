@@ -25,6 +25,11 @@ public enum ErrorCode {
     CANNOT_SELECT_OWN_COMMENT(HttpStatus.BAD_REQUEST,"A004","본인의 답변을 채택할 수 없습니다."),
     ALREADY_SELECTED_ANSWER(HttpStatus.BAD_REQUEST,"A005","이미 채택된 답변이 존재합니다."),
 
+    // 신고 관련 에러
+    ALREADY_REPORTED(HttpStatus.BAD_REQUEST, "R001" ,"이미 신고한 대상입니다." ),
+    INVALID_TARGET_TYPE(HttpStatus.BAD_REQUEST,"R002" ,"신고 유형이 올바르지 않습니다." ),
+    CANNOT_REPORT_OWN(HttpStatus.BAD_REQUEST,"R003" ,"본인을 신고할 수 없습니다." ),
+
     // AI 답변 관련 에러 추가
     AI_REPLY_NOT_FOUND(HttpStatus.NOT_FOUND, "AI001", "AI 답변을 찾을 수 없습니다."),
     INVALID_ASSISTANT_CATEGORY(HttpStatus.BAD_REQUEST, "AI002", "지원하지 않는 카테고리입니다."),
