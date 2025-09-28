@@ -38,6 +38,9 @@ public class Report {
 
     private String reason;
 
+    @Enumerated(EnumType.STRING)
+    private ReportStatus status = ReportStatus.PENDING; // 기본값 미처리
+
     private LocalDateTime createdAt = LocalDateTime.now();
 
     private String targetContent;
