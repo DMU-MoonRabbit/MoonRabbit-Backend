@@ -18,8 +18,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class User {
-    private static final String ROLE_USER = "USER";
-    private static final String ROLE_ADMIN = "ADMIN";
+    private static final String ROLE_USER = "ROLE_USER";
+    private static final String ROLE_ADMIN = "ROLE_ADMIN";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

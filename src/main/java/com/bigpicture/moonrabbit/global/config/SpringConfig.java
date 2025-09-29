@@ -1,5 +1,7 @@
 package com.bigpicture.moonrabbit.global.config;
 
+import com.bigpicture.moonrabbit.domain.admin.service.AdminService;
+import com.bigpicture.moonrabbit.domain.admin.service.AdminServiceImpl;
 import com.bigpicture.moonrabbit.domain.answer.repository.AnswerRepository;
 import com.bigpicture.moonrabbit.domain.answer.service.AnswerService;
 import com.bigpicture.moonrabbit.domain.answer.service.AnswerServiceImpl;
@@ -96,4 +98,8 @@ public class SpringConfig {
         return new ReportServiceImpl(reportRepository, boardRepository, answerRepository);
     }
 
+    @Bean
+    public AdminService adminService() {
+        return new AdminServiceImpl(userRepository, boardRepository, userService());
+    }
 }

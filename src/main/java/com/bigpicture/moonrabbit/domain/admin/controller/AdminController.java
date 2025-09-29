@@ -1,0 +1,53 @@
+package com.bigpicture.moonrabbit.domain.admin.controller;
+
+import com.bigpicture.moonrabbit.domain.admin.dto.AdminResponseDTO;
+import com.bigpicture.moonrabbit.domain.admin.dto.UserAdminResponseDTO;
+import com.bigpicture.moonrabbit.domain.admin.service.AdminService;
+import com.bigpicture.moonrabbit.domain.board.dto.BoardRequestDTO;
+import com.bigpicture.moonrabbit.domain.board.dto.BoardResponseDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/admin")
+@RequiredArgsConstructor
+public class AdminController {
+    private final AdminService adminService;
+
+    @GetMapping("/users")
+    @Operation(summary = "유저 목록 조회", description = "유저들의 목록을 조회하는 기능")
+    public Page<UserAdminResponseDTO> getUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return adminService.getUserList(page, size);
+    }
+
+    @PutMapping("/users/{userId}/point")
+    @Operation(summary = "특정 유저 포인트 지급/감소", description = "특정 유저의 포인트를 지급/감소 하는 기능")
+    public UserAdminResponseDTO updateUserPoint(@PathVariable Long userId, @RequestParam int point) {
+       return adminService.updateUserPoint(userId, point);
+    }
+
+    @PutMapping("/users/{userId}/trust")
+    @Operation(summary = "특정 유저 신뢰도 지급/감소", description = "특정 유저의 신뢰도를 지급/감소 하는 기능")
+    public UserAdminResponseDTO updateUserTrust(@PathVariable Long userId, @RequestParam int point) {
+        return adminService.updateUserTrust(userId, point);
+    }
+
+    @PutMapping("/boards/{boardId}")
+    @Operation(summary = "특정 게시물 수정", description = "특정 게시물을 수정하는 기능")
+    public BoardResponseDTO updateBoardAsAdmin(@PathVariable Long boardId,
+                                               @RequestBody BoardRequestDTO boardDTO) {
+        return adminService.updateBoardAsAdmin(boardId, boardDTO);
+    }
+
+    @DeleteMapping("/boards/{boardId}")
+    @Operation(summary = "특정 게시글 삭제하는 기능", description = "특정 게시글을 삭제하는 기능")
+    public AdminResponseDTO deleteBoardAsAdmin(@PathVariable Long boardId) {
+        adminService.deleteBoardAsAdmin(boardId);
+        return new AdminResponseDTO("게시글 ID : "+boardId+" 삭제되었습니다.");
+    }
+}
