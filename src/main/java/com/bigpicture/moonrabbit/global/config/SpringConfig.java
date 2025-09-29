@@ -18,6 +18,9 @@ import com.bigpicture.moonrabbit.domain.like.service.LikeServiceImpl;
 import com.bigpicture.moonrabbit.domain.playlist.repository.PlaylistRepository;
 import com.bigpicture.moonrabbit.domain.playlist.service.PlaylistService;
 import com.bigpicture.moonrabbit.domain.playlist.service.PlaylistServiceImpl;
+import com.bigpicture.moonrabbit.domain.report.repository.ReportRepository;
+import com.bigpicture.moonrabbit.domain.report.service.ReportService;
+import com.bigpicture.moonrabbit.domain.report.service.ReportServiceImpl;
 import com.bigpicture.moonrabbit.domain.sms.repository.SmsRepository;
 import com.bigpicture.moonrabbit.domain.sms.service.SmsService;
 import com.bigpicture.moonrabbit.domain.sms.service.SmsServiceImpl;
@@ -46,6 +49,7 @@ public class SpringConfig {
     private final PlaylistRepository playlistRepository;
     private final LikesRepository likesRepository;
     private final BoardLikeRepository boardLikeRepository;
+    private final ReportRepository reportRepository;
 
     @Bean
     public UserService userService() {
@@ -85,6 +89,11 @@ public class SpringConfig {
     @Bean
     public BoardLikeService boardLikeService() {
         return new BoardLikeServiceImpl(boardLikeRepository, boardRepository, userRepository, userService());
+    }
+
+    @Bean
+    public ReportService reportService() {
+        return new ReportServiceImpl(reportRepository, boardRepository, answerRepository);
     }
 
 }
