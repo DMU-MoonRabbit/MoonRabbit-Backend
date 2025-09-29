@@ -30,4 +30,16 @@ public class UserItemController {
     ) {
         return userItemService.buyItem(userId, itemId);
     }
+
+    @PutMapping("/{userItemId}/equip")
+    @Operation(summary = "아이템 장착", description = "유저가 아이템을 장착하는 기능")
+    public UserItemResponseDTO equipItem(@PathVariable Long userItemId) {
+        return userItemService.equipItem(userItemId);
+    }
+
+    @PutMapping("/{userItemId}/unequip")
+    @Operation(summary = "아이템 장착해제", description = "유저가 아이템을 장착해제하는 기능")
+    public UserItemResponseDTO unequipItem(@PathVariable Long userItemId) {
+        return userItemService.unequipItem(userItemId);
+    }
 }

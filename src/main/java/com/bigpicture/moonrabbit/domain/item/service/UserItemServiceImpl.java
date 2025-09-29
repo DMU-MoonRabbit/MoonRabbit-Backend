@@ -7,6 +7,7 @@ import com.bigpicture.moonrabbit.domain.item.repository.ItemRepository;
 import com.bigpicture.moonrabbit.domain.item.repository.UserItemRepository;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
 import com.bigpicture.moonrabbit.domain.user.repository.UserRepository;
+import com.bigpicture.moonrabbit.domain.user.service.UserService;
 import com.bigpicture.moonrabbit.global.exception.CustomException;
 import com.bigpicture.moonrabbit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -23,13 +26,20 @@ public class UserItemServiceImpl implements UserItemService{
     private final UserItemRepository userItemRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    private final UserService userService;
 
+    @Override
     public Page<UserItemResponseDTO> getUserItems(Long userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         return userItemRepository.findByUserId(userId, pageable)
-                .map(UserItemResponseDTO::new);
+                .map(userItem -> new UserItemResponseDTO(
+                        userItem,
+                        "" // content를 여기서 지정
+                ));
     }
 
+
+    @Override
     @Transactional
     public UserItemResponseDTO buyItem(Long userId, Long itemId) {
         // 1. 사용자 조회
@@ -65,6 +75,51 @@ public class UserItemServiceImpl implements UserItemService{
         userItemRepository.save(userItem);
 
         // 6. DTO 반환
-        return new UserItemResponseDTO(userItem);
+        return new UserItemResponseDTO(userItem, "구매가 완료되었습니다.");
+    }
+
+    @Transactional
+    @Override
+    public UserItemResponseDTO equipItem(Long userItemId) {
+
+        // 1. 인증된 사용자 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        User currentUser = userService.getUserByEmail(email); // 또는 userId
+
+        UserItem userItem = userItemRepository.findById(userItemId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+
+        // 3. 현재 사용자와 소유자가 일치하는지 확인
+        if (!userItem.getUser().getId().equals(currentUser.getId())) {
+            throw new CustomException(ErrorCode.USER_INCORRECT);
+        }
+
+        // 동일 타입의 다른 아이템이 장착되어 있으면 해제
+        userItemRepository.findByUserIdAndItemTypeAndEquipped(userItem.getUser().getId(),
+                        userItem.getItem().getType(), true)
+                .forEach(ui -> ui.setEquipped(false));
+
+        userItem.setEquipped(true);
+        return new UserItemResponseDTO(userItem, "아이템이 장착되었습니다.");
+    }
+
+    @Transactional
+    @Override
+    public UserItemResponseDTO unequipItem(Long userItemId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        User currentUser = userService.getUserByEmail(email);
+
+        UserItem userItem = userItemRepository.findById(userItemId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+
+        // 소유자 확인
+        if (!userItem.getUser().getId().equals(currentUser.getId())) {
+            throw new CustomException(ErrorCode.USER_INCORRECT);
+        }
+
+        userItem.setEquipped(false);
+        return new UserItemResponseDTO(userItem, "아이템이 장착해제 되었습니다.");
     }
 }

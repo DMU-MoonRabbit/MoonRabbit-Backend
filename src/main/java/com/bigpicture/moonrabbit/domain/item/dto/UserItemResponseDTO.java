@@ -16,9 +16,10 @@ public class UserItemResponseDTO {
     private boolean equipped;
     private LocalDateTime createdAt;
     private String imageUrl;
+    private String content = "";
 
     // 엔티티 기반 생성자 — service에서 .map(UserItemResponseDTO::new)으로 사용
-    public UserItemResponseDTO(UserItem userItem) {
+    public UserItemResponseDTO(UserItem userItem, String content) {
         this.id = userItem.getId();
         this.itemId = userItem.getItem().getId();
         this.itemName = userItem.getItem().getName();
@@ -27,5 +28,6 @@ public class UserItemResponseDTO {
         this.equipped = userItem.isEquipped();
         this.createdAt = userItem.getCreatedAt();
         this.imageUrl = userItem.getItem().getImageUrl();
+        this.content = content;
     }
 }

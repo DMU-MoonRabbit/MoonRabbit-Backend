@@ -111,6 +111,6 @@ public class SpringConfig {
 
     @Bean
     public UserItemService userItemService() {
-        return new UserItemServiceImpl(userItemRepository, userRepository, itemRepository);
+        return new UserItemServiceImpl(userItemRepository, userRepository, itemRepository, userService());
     }
 }

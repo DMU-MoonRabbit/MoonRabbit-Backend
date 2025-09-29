@@ -9,4 +9,8 @@ public interface UserItemService {
 
     public UserItemResponseDTO buyItem(Long userId, Long itemId);
 
+    public UserItemResponseDTO equipItem(Long userItemId);
+
+    public UserItemResponseDTO unequipItem(Long userItemId);
+
 }
