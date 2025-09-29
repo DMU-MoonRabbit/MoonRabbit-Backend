@@ -66,7 +66,7 @@ public class CustomOAuth2UserServiceImpl extends DefaultOAuth2UserService implem
                         .provider(provider)
                         .providerId(providerId)
                         .password("")
-                        .role("ROLE_USER")
+                        .role("USER")
                         .level(1)
                         .build())
         );
