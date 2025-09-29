@@ -14,6 +14,10 @@ import com.bigpicture.moonrabbit.domain.boardLike.service.BoardLikeServiceImpl;
 import com.bigpicture.moonrabbit.domain.example.aiservice.repository.AssistantReplyRepository;
 import com.bigpicture.moonrabbit.domain.example.aiservice.service.AssistantReplyService;
 import com.bigpicture.moonrabbit.domain.example.aiservice.service.AssistantReplyServiceImpl;
+import com.bigpicture.moonrabbit.domain.item.repository.ItemRepository;
+import com.bigpicture.moonrabbit.domain.item.repository.UserItemRepository;
+import com.bigpicture.moonrabbit.domain.item.service.UserItemService;
+import com.bigpicture.moonrabbit.domain.item.service.UserItemServiceImpl;
 import com.bigpicture.moonrabbit.domain.like.repository.LikesRepository;
 import com.bigpicture.moonrabbit.domain.like.service.LikeService;
 import com.bigpicture.moonrabbit.domain.like.service.LikeServiceImpl;
@@ -52,6 +56,8 @@ public class SpringConfig {
     private final LikesRepository likesRepository;
     private final BoardLikeRepository boardLikeRepository;
     private final ReportRepository reportRepository;
+    private final UserItemRepository userItemRepository;
+    private final ItemRepository itemRepository;
 
     @Bean
     public UserService userService() {
@@ -101,5 +107,10 @@ public class SpringConfig {
     @Bean
     public AdminService adminService() {
         return new AdminServiceImpl(userRepository, boardRepository, userService());
+    }
+
+    @Bean
+    public UserItemService userItemService() {
+        return new UserItemServiceImpl(userItemRepository, userRepository, itemRepository, userService());
     }
 }
