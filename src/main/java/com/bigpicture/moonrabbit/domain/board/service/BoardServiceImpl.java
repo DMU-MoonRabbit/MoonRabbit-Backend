@@ -100,7 +100,8 @@ public class BoardServiceImpl implements BoardService {
 
         Board board = boardRepository.findWithCommentsById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
-        return new BoardResponseDTO(board, null);
+        Long userId = board.getUser().getId();
+        return new BoardResponseDTO(board, userId);
     }
 
     @Override
