@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +28,10 @@ public class UserController {
     private final UserService userService;
 
 
+    @GetMapping("/api/admin/debug")
+    public String debug(Authentication authentication) {
+        return "Authorities: " + authentication.getAuthorities();
+    }
     @GetMapping("/kakao")
     public void kakaoLogin(HttpServletResponse response) throws IOException {
         response.sendRedirect("/oauth2/authorization/kakao");
