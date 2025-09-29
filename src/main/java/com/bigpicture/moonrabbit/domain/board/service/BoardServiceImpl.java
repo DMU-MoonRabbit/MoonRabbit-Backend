@@ -97,23 +97,14 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public BoardResponseDTO selectOne(Long id) {
-        // 인증된 사용자 정보 가져오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName(); // JWT 등에서 subject(email)
-        Long currentUserId = userService.getUserIdByEmail(email);
 
         Board board = boardRepository.findWithCommentsById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
-        return new BoardResponseDTO(board, currentUserId);
+        return new BoardResponseDTO(board, null);
     }
 
     @Override
     public Page<BoardResponseDTO> selectPaged(int page, int size) {
-//        인증된 사용자 정보 가져오기
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        String email = authentication.getName();
-//        Long currentUserId = userService.getUserIdByEmail(email);
-
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         return boardRepository.findAll(pageable).map(board -> new BoardResponseDTO(board, null));
     }
