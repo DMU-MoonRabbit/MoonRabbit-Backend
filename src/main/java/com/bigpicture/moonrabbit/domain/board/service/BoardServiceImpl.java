@@ -109,12 +109,12 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public Page<BoardResponseDTO> selectPaged(int page, int size) {
-        // 인증된 사용자 정보 가져오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        Long currentUserId = userService.getUserIdByEmail(email);
+//        인증된 사용자 정보 가져오기
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String email = authentication.getName();
+//        Long currentUserId = userService.getUserIdByEmail(email);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        return boardRepository.findAll(pageable).map(board -> new BoardResponseDTO(board, currentUserId));
+        return boardRepository.findAll(pageable).map(board -> new BoardResponseDTO(board, null));
     }
 }
