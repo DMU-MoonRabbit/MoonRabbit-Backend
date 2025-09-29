@@ -24,7 +24,12 @@ public enum ErrorCode {
     UNAUTHORIZED_ACTION(HttpStatus.BAD_REQUEST,"A003","글쓴이만 가능합니다." ),
     CANNOT_SELECT_OWN_COMMENT(HttpStatus.BAD_REQUEST,"A004","본인의 답변을 채택할 수 없습니다."),
     ALREADY_SELECTED_ANSWER(HttpStatus.BAD_REQUEST,"A005","이미 채택된 답변이 존재합니다."),
-
+    
+    // 아이템 관련 에러
+    ITEM_NOT_FOUND(HttpStatus.BAD_REQUEST,"I001","아이템을 찾을 수 없습니다."),
+    INSUFFICIENT_POINT(HttpStatus.BAD_REQUEST,"I002","아이템을 구매하기 위한 포인트가 부족합니다."),
+    ALREADY_OWNED_ITEM(HttpStatus.BAD_REQUEST,"I003","해당 아이템을 이미 보유중입니다."),
+    
     // 신고 관련 에러
     ALREADY_REPORTED(HttpStatus.BAD_REQUEST, "R001" ,"이미 신고한 대상입니다." ),
     INVALID_TARGET_TYPE(HttpStatus.BAD_REQUEST,"R002" ,"신고 유형이 올바르지 않습니다." ),
