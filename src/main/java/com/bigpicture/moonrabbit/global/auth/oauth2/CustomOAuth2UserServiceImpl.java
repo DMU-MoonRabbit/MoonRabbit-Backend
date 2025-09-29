@@ -56,7 +56,7 @@ public class CustomOAuth2UserServiceImpl extends DefaultOAuth2UserService implem
         } else {
             throw new OAuth2AuthenticationException("지원하지 않는 OAuth2 제공자입니다: " + provider);
         }
-        //System.out.println("attributes = " + attributes);
+
 
         User user = userRepository.findByEmail(email).orElseGet(() ->
                 userRepository.save(User.builder()

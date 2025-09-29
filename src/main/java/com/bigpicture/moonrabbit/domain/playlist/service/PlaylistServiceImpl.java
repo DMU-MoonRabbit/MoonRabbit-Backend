@@ -32,7 +32,7 @@ public class PlaylistServiceImpl implements PlaylistService {
                 .map(dto -> {
 
                     String videoId = extractVideoId(dto.getVideoUrl());
-                    System.out.println("▶ videoId: " + videoId);
+                    
 
                     if (videoId == null) {
                         throw new IllegalArgumentException(" 유효하지 않은 유튜브 URL입니다: " + dto.getVideoUrl());

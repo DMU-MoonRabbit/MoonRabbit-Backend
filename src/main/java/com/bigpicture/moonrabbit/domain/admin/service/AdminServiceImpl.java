@@ -30,7 +30,6 @@ public class AdminServiceImpl implements AdminService{
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         int beforePoint = user.getPoint();
-        System.out.println("beforePoint = " + beforePoint);
         user.changePoint(point);
         UserAdminResponseDTO userAdminResponseDTO = new UserAdminResponseDTO(user);
         userAdminResponseDTO.setContent("수정 전 포인트 : "+beforePoint+" 수정 후 포인트 : "+user.getPoint());
