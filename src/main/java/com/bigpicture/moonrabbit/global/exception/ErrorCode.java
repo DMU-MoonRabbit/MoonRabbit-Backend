@@ -29,7 +29,10 @@ public enum ErrorCode {
     ITEM_NOT_FOUND(HttpStatus.BAD_REQUEST,"I001","아이템을 찾을 수 없습니다."),
     INSUFFICIENT_POINT(HttpStatus.BAD_REQUEST,"I002","아이템을 구매하기 위한 포인트가 부족합니다."),
     ALREADY_OWNED_ITEM(HttpStatus.BAD_REQUEST,"I003","해당 아이템을 이미 보유중입니다."),
-    
+
+    // 일일질문 관련 에러
+    QUESTION_NOT_FOUND(HttpStatus.BAD_REQUEST,"Q001","오늘의 질문이 존재하지 않습니다."),
+    QUESTION_ANSWER_NOT_FOUND(HttpStatus.BAD_REQUEST,"Q001","답변이 존재하지 않습니다."),
     // 신고 관련 에러
     ALREADY_REPORTED(HttpStatus.BAD_REQUEST, "R001" ,"이미 신고한 대상입니다." ),
     INVALID_TARGET_TYPE(HttpStatus.BAD_REQUEST,"R002" ,"신고 유형이 올바르지 않습니다." ),
