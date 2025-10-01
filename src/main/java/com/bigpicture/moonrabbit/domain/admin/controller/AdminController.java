@@ -5,6 +5,9 @@ import com.bigpicture.moonrabbit.domain.admin.dto.UserAdminResponseDTO;
 import com.bigpicture.moonrabbit.domain.admin.service.AdminService;
 import com.bigpicture.moonrabbit.domain.board.dto.BoardRequestDTO;
 import com.bigpicture.moonrabbit.domain.board.dto.BoardResponseDTO;
+import com.bigpicture.moonrabbit.domain.dailyquestion.dto.DailyQuestionRequestDTO;
+import com.bigpicture.moonrabbit.domain.dailyquestion.dto.DailyQuestionResponseDTO;
+import com.bigpicture.moonrabbit.domain.dailyquestion.service.DailyQuestionService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AdminController {
     private final AdminService adminService;
+    private final DailyQuestionService dailyQuestionService;
 
     @GetMapping("/users")
     @Operation(summary = "유저 목록 조회", description = "유저들의 목록을 조회하는 기능")
