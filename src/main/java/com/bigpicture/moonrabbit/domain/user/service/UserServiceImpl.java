@@ -80,7 +80,8 @@ public class UserServiceImpl implements UserService {
     // 이메일과 비밀번호로 로그인
     public JwtDTO login(String email, String password) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND)); // 사용자 존재 여부 확인
+                .orElseThrow(() ->
+                        new CustomException(ErrorCode.USER_NOT_FOUND)); // 사용자 존재 여부 확인
         if(!(user.getProvider().equals("common"))) {
             throw new CustomException(ErrorCode.USER_OTHER_PROVIDER);
         }
