@@ -109,4 +109,12 @@ public class BoardServiceImpl implements BoardService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         return boardRepository.findAll(pageable).map(board -> new BoardResponseDTO(board, null));
     }
+
+    @Override
+    public Page<BoardResponseDTO> selectPagedByUser(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        return boardRepository.findByUser_Id(userId, pageable)
+                .map(board -> new BoardResponseDTO(board, userId));
+    }
 }

@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
     Optional<Board> findWithCommentsById(Long id);
+
+    Page<Board> findByUser_Id(Long userId, Pageable pageable);
 }
