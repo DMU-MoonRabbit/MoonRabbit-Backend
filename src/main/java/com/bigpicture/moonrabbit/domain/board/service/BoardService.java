@@ -18,4 +18,6 @@ public interface BoardService {
     BoardResponseDTO selectOne(Long id);
 
     Page<BoardResponseDTO> selectPaged(int page, int size);
+
+    Page<BoardResponseDTO> selectPagedByUser(Long userId, int page, int size);
 }

@@ -102,4 +102,18 @@ public class BoardController {
         Board updatedBoard = answerService.selectAnswer(boardId, answerId, userId);
         return ResponseEntity.ok(new BoardResponseDTO(updatedBoard, userId));
     }
+
+    @Operation(summary = "내 게시글 조회", description = "로그인한 사용자가 작성한 게시글 페이징 조회")
+    @GetMapping("/my")
+    public ResponseEntity<Page<BoardResponseDTO>> listMyBoardsPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "2") int size
+    ) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Long userId = userService.getUserIdByEmail(email);
+
+        Page<BoardResponseDTO> pagedResult = boardService.selectPagedByUser(userId, page, size);
+        return new ResponseEntity<>(pagedResult, HttpStatus.OK);
+    }
 }
