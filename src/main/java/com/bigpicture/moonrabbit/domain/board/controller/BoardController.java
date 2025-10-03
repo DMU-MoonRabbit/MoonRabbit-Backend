@@ -103,9 +103,9 @@ public class BoardController {
         return ResponseEntity.ok(new BoardResponseDTO(updatedBoard, userId));
     }
 
-    @Operation(summary = "내 게시글 조회", description = "로그인한 사용자가 작성한 게시글 페이징 조회")
+    @Operation(summary = "내 게시글 조회", description = "로그인한 사용자가 작성한 게시글 페이징 조회 + 총 글 개수")
     @GetMapping("/my")
-    public ResponseEntity<Page<BoardResponseDTO>> listMyBoardsPaged(
+    public ResponseEntity<Map<String, Object>> listMyBoardsPaged(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "2") int size
     ) {
@@ -114,6 +114,14 @@ public class BoardController {
         Long userId = userService.getUserIdByEmail(email);
 
         Page<BoardResponseDTO> pagedResult = boardService.selectPagedByUser(userId, page, size);
-        return new ResponseEntity<>(pagedResult, HttpStatus.OK);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("totalCount", pagedResult.getTotalElements());
+        response.put("totalPages", pagedResult.getTotalPages());
+        response.put("pageNumber", pagedResult.getNumber());
+        response.put("pageSize", pagedResult.getSize());
+        response.put("content", pagedResult.getContent());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
