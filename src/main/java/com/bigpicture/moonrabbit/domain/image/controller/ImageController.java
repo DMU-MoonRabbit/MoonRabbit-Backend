@@ -1,5 +1,6 @@
 package com.bigpicture.moonrabbit.domain.image.controller;
 
+import com.bigpicture.moonrabbit.domain.image.entity.FileType;
 import com.bigpicture.moonrabbit.domain.image.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,19 +16,32 @@ public class ImageController {
 
     private final S3Service s3Service;
 
-    @PostMapping("/upload")
-    public ResponseEntity<String> upload(@RequestParam("file") MultipartFile file) throws IOException {
-        return ResponseEntity.ok(s3Service.uploadFile(file));
+    public record UploadResponseDto(String imageUrl) {}
+
+    // 업로드
+    @PostMapping("/upload/{type}")
+    public UploadResponseDto upload(
+            @PathVariable String type,
+            @RequestParam("file") MultipartFile file) {
+        FileType fileType = FileType.valueOf(type.toUpperCase());
+        String imageUrl = s3Service.uploadFile(file, fileType);
+        return new UploadResponseDto(imageUrl);
     }
 
+    // 삭제
     @DeleteMapping
-    public ResponseEntity<Void> delete(@RequestParam String url) {
+    public void delete(@RequestParam String url) {
         s3Service.deleteFile(url);
-        return ResponseEntity.noContent().build();
     }
 
-    @PutMapping
-    public ResponseEntity<String> update(@RequestParam String oldUrl, @RequestParam MultipartFile file) throws IOException {
-        return ResponseEntity.ok(s3Service.updateFile(oldUrl, file));
+    // 수정
+    @PutMapping("/{type}")
+    public UploadResponseDto update(
+            @PathVariable String type,
+            @RequestParam String oldUrl,
+            @RequestParam("file") MultipartFile file) {
+        FileType fileType = FileType.valueOf(type.toUpperCase());
+        String newImageUrl = s3Service.updateFile(oldUrl, file, fileType);
+        return new UploadResponseDto(newImageUrl);
     }
 }

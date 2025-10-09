@@ -1,72 +1,102 @@
 package com.bigpicture.moonrabbit.domain.image.service;
 
-import lombok.RequiredArgsConstructor;
+import com.bigpicture.moonrabbit.domain.image.entity.FileType;
+import com.bigpicture.moonrabbit.global.exception.CustomException;
+import com.bigpicture.moonrabbit.global.exception.ErrorCode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetUrlRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
-import java.io.IOException;
-import java.net.URL;
-import java.time.Instant;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class S3Service {
 
     private final S3Client s3Client;
+    private final String bucket;
 
-    @Value("${aws.s3.bucket}")
-    private String bucketName;
+    public S3Service(S3Client s3Client, @Value("${aws.s3.bucket}") String bucket) {
+        this.s3Client = s3Client;
+        this.bucket = bucket;
+    }
 
-    // 등록
-    public String uploadFile(MultipartFile file) throws IOException {
-        String fileName = generateFileName(file.getOriginalFilename());
+    // 업로드
+    public String uploadFile(MultipartFile file, FileType fileType) {
+        if (file.isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_FILE_TYPE);
+        }
 
-        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .bucket(bucketName)
-                .key(fileName)
-                .contentType(file.getContentType())
-                .build();
+        try {
+            String originalName = file.getOriginalFilename();
+            if (originalName == null) originalName = "file";
 
-        s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+            String key = fileType.getPrefix() + UUID.randomUUID() + "_" +
+                    URLEncoder.encode(originalName, StandardCharsets.UTF_8);
 
-        return getFileUrl(fileName);
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(key)
+                    .contentType(file.getContentType())
+                    .build();
+
+            s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
+
+            GetUrlRequest getUrlRequest = GetUrlRequest.builder()
+                    .bucket(bucket)
+                    .key(key)
+                    .build();
+
+            return s3Client.utilities().getUrl(getUrlRequest).toString();
+
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED);
+        }
     }
 
     // 삭제
     public void deleteFile(String fileUrl) {
-        String key = extractKeyFromUrl(fileUrl);
-
-        DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
-                .bucket(bucketName)
-                .key(key)
-                .build();
-
-        s3Client.deleteObject(deleteRequest);
+        try {
+            String key = extractKeyFromUrl(fileUrl);
+            s3Client.deleteObject(DeleteObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(key)
+                    .build());
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.IMAGE_DELETE_FAILED);
+        }
     }
 
-    // 수정
-    public String updateFile(String oldUrl, MultipartFile newFile) throws IOException {
-        deleteFile(oldUrl);
-        return uploadFile(newFile);
+    // 수정 (업로드 후 이전 파일 삭제)
+    public String updateFile(String oldFileUrl, MultipartFile newFile, FileType fileType) {
+        String newFileUrl = uploadFile(newFile, fileType);
+
+        if (oldFileUrl != null && !oldFileUrl.isBlank()) {
+            try {
+                deleteFile(oldFileUrl);
+            } catch (CustomException e) {
+            }
+        }
+
+        return newFileUrl;
     }
 
-    // 파일명 생성
-    private String generateFileName(String originalName) {
-        return UUID.randomUUID() + "_" + originalName.replace(" ", "_");
-    }
-
-    // URL 반환
-    private String getFileUrl(String fileName) {
-        return "https://" + bucketName + ".s3." + s3Client.serviceClientConfiguration().region().id() + ".amazonaws.com/" + fileName;
-    }
-
-    // URL → key 추출
+    // S3 URL에서 키 추출
     private String extractKeyFromUrl(String fileUrl) {
-        return fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+        try {
+            URI uri = new URI(fileUrl);
+            String path = uri.getPath();
+            return path.substring(1); // 맨 앞 '/' 제거
+        } catch (URISyntaxException e) {
+            throw new CustomException(ErrorCode.INVALID_FILE_TYPE);
+        }
     }
 }

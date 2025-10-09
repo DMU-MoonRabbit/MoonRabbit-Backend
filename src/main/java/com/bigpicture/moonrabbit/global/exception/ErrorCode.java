@@ -55,7 +55,12 @@ public enum ErrorCode {
     ALREADY_LIKED_BOARD(HttpStatus.BAD_REQUEST, "L002" , "이미 북마크가 되어있는 고민입니다." ),
 
     // SMS 관련 에러
-    SMS_CERTIFICATION_FAILED(HttpStatus.BAD_REQUEST, "P003", "인증 에러가 발생했습니다.");
+    SMS_CERTIFICATION_FAILED(HttpStatus.BAD_REQUEST, "P003", "인증 에러가 발생했습니다."),
+
+    // S3 이미지 관련 에러
+    IMAGE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "IMG001", "이미지 업로드에 실패했습니다."),
+    IMAGE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "IMG002", "이미지 삭제에 실패했습니다."),
+    INVALID_FILE_TYPE(HttpStatus.BAD_REQUEST, "IMG003", "지원하지 않는 파일 타입입니다.");
 
     private final HttpStatus status;
     private final String code;
