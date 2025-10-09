@@ -14,6 +14,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -93,10 +94,11 @@ public class S3Service {
     private String extractKeyFromUrl(String fileUrl) {
         try {
             URI uri = new URI(fileUrl);
-            String path = uri.getPath();
-            return path.substring(1); // 맨 앞 '/' 제거
+            String path = uri.getRawPath();
+            return path.substring(1);
         } catch (URISyntaxException e) {
             throw new CustomException(ErrorCode.INVALID_FILE_TYPE);
         }
     }
+
 }
