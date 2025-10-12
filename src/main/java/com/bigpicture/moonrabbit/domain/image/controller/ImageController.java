@@ -24,7 +24,7 @@ public class ImageController {
     @Operation(summary = "이미지 업로드", description = "MultipartFile을 받아 지정된 파일 타입 폴더에 S3 업로드 후 URL 반환")
     @PostMapping("/upload/{type}")
     public UploadResponseDto upload(
-            @Parameter(description = "파일 타입", example = "USER_PROFILE") @PathVariable String type,
+            @Parameter(description = "파일 타입", example = "PROFILE, BANNER, BORDER") @PathVariable String type,
             @Parameter(description = "업로드할 파일") @RequestParam("file") MultipartFile file) {
         FileType fileType = FileType.valueOf(type.toUpperCase());
         String imageUrl = s3Service.uploadFile(file, fileType);
