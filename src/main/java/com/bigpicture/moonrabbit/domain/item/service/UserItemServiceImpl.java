@@ -100,9 +100,12 @@ public class UserItemServiceImpl implements UserItemService{
         }
 
         // 동일 타입의 다른 아이템이 장착되어 있으면 해제
-        userItemRepository.findByUserIdAndItemTypeAndEquipped(userItem.getUser().getId(),
-                        userItem.getItem().getType(), true)
-                .forEach(ui -> ui.setEquipped(false));
+        List<UserItem> equippedItems = userItemRepository.findByUserIdAndItemTypeAndEquipped(userItem.getUser().getId(),
+                        userItem.getItem().getType(), true);
+        for (UserItem ui : equippedItems) {
+            ui.setEquipped(false);
+            userItemRepository.save(ui); // 변경 사항 저장
+        }
 
         userItem.setEquipped(true);
         return new UserItemResponseDTO(userItem, "아이템이 장착되었습니다.");
@@ -126,7 +129,8 @@ public class UserItemServiceImpl implements UserItemService{
         }
 
         userItem.setEquipped(false);
-        return new UserItemResponseDTO(userItem, "아이템이 장착해제 되었습니다.");
+        UserItem savedItem = userItemRepository.save(userItem);
+        return new UserItemResponseDTO(savedItem, "아이템이 장착해제 되었습니다.");
     }
 
     @Override
