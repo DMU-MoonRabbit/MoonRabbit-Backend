@@ -69,6 +69,9 @@ dependencies {
 	}
 	implementation 'dev.langchain4j:langchain4j-reactor'
 
+    // AWS SDK v2
+    implementation 'software.amazon.awssdk:s3:2.25.32'
+    implementation 'software.amazon.awssdk:sts:2.25.32'
 }
 
 // LangChain4j BOM

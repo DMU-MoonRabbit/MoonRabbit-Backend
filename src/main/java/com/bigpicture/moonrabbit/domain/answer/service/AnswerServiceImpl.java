@@ -8,11 +8,13 @@ import com.bigpicture.moonrabbit.domain.board.entity.Board;
 import com.bigpicture.moonrabbit.domain.board.repository.BoardRepository;
 import com.bigpicture.moonrabbit.domain.item.dto.EquippedItemDTO;
 import com.bigpicture.moonrabbit.domain.item.service.UserItemService;
+import com.bigpicture.moonrabbit.domain.notification.dto.NotificationResponseDTO;
+import com.bigpicture.moonrabbit.domain.notification.repository.NotificationRepository;
+import com.bigpicture.moonrabbit.domain.notification.service.NotificationService;
 import com.bigpicture.moonrabbit.domain.point.Point;
 import com.bigpicture.moonrabbit.domain.trust.Trust;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
 import com.bigpicture.moonrabbit.domain.user.repository.UserRepository;
-import com.bigpicture.moonrabbit.domain.user.service.UserService;
 import com.bigpicture.moonrabbit.global.exception.CustomException;
 import com.bigpicture.moonrabbit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,8 @@ public class AnswerServiceImpl implements AnswerService {
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
     private final UserItemService userItemService;
+    private final NotificationService notificationService;
+    private final NotificationRepository notificationRepository;
 
     @Override
     public AnswerResponseDTO save(AnswerRequestDTO answerDTO, Long userId, Long boardId) {
@@ -53,6 +57,20 @@ public class AnswerServiceImpl implements AnswerService {
 
 
         Answer savedAnswer = answerRepository.save(answer);
+
+        if (!board.getUser().getId().equals(userId)) { // 자기 댓글이면 제외
+            notificationService.createCommentNotification(
+                    user,                 // 작성자
+                    board.getUser(),       // 게시글 작성자
+                    savedAnswer
+            );
+
+            NotificationResponseDTO dto = NotificationResponseDTO.fromEntity(
+                    notificationRepository.findTopByOrderByCreatedAtDesc() // 마지막 저장된 알림
+            );
+            notificationService.sendNotification(board.getUser().getId(), dto);
+        }
+
         List<EquippedItemDTO> equippedItems = userItemService.getEquippedItems(userId);
         return new AnswerResponseDTO(savedAnswer, user.getId(), equippedItems);
     }

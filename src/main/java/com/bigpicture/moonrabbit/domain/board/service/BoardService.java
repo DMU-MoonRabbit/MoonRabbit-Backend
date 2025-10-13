@@ -21,4 +21,6 @@ public interface BoardService {
     Page<BoardResponseDTO> selectPaged(int page, int size);
 
     BoardResponseDTO toDto(Board board, Long currentUserId);
+
+    Page<BoardResponseDTO> selectPagedByUser(Long userId, int page, int size);
 }

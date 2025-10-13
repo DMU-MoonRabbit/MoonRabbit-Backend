@@ -15,7 +15,7 @@ public class BoardRequestDTO {
     @Schema(description = "내용", example = "content")
     private String content;
 
-    @Schema(description = "분야", example = "전체, 가족, 연인 ...")
+    @Schema(description = "분야", example = "전체")
     private String category;
 
 

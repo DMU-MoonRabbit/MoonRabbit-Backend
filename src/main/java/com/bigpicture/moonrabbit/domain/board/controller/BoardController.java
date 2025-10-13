@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
+import java.util.HashMap;
 
 import java.util.List;
 
@@ -111,5 +113,27 @@ public class BoardController {
 
 
         return ResponseEntity.ok(updatedBoardResponse);
+    }
+
+    @Operation(summary = "내 게시글 조회", description = "로그인한 사용자가 작성한 게시글 페이징 조회 + 총 글 개수")
+    @GetMapping("/my")
+    public ResponseEntity<Map<String, Object>> listMyBoardsPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "2") int size
+    ) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Long userId = userService.getUserIdByEmail(email);
+
+        Page<BoardResponseDTO> pagedResult = boardService.selectPagedByUser(userId, page, size);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("totalCount", pagedResult.getTotalElements());
+        response.put("totalPages", pagedResult.getTotalPages());
+        response.put("pageNumber", pagedResult.getNumber());
+        response.put("pageSize", pagedResult.getSize());
+        response.put("content", pagedResult.getContent());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
