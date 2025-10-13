@@ -5,6 +5,7 @@ import com.bigpicture.moonrabbit.domain.board.dto.BoardRequestDTO;
 import com.bigpicture.moonrabbit.domain.board.dto.BoardResponseDTO;
 import com.bigpicture.moonrabbit.domain.board.entity.Board;
 import com.bigpicture.moonrabbit.domain.board.repository.BoardRepository;
+import com.bigpicture.moonrabbit.domain.board.service.BoardService;
 import com.bigpicture.moonrabbit.domain.point.Point;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
 import com.bigpicture.moonrabbit.domain.user.repository.UserRepository;
@@ -22,7 +23,7 @@ public class AdminServiceImpl implements AdminService{
 
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
-    private final UserService userService;
+    private final BoardService boardService;
 
 
     @Transactional
@@ -59,7 +60,7 @@ public class AdminServiceImpl implements AdminService{
         board.setCategory(boardDTO.getCategory());
 
         Board updatedBoard = boardRepository.save(board);
-        return new BoardResponseDTO(updatedBoard, board.getUser().getId());
+        return boardService.toDto(board, null);
     }
 
     @Transactional

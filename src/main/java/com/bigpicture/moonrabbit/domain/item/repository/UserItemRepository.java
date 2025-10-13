@@ -12,4 +12,5 @@ public interface UserItemRepository extends JpaRepository<UserItem,Long> {
     Page<UserItem> findByUserId(Long userId, Pageable pageable);
     boolean existsByUserIdAndItemId(Long userId, Long itemId);
     List<UserItem> findByUserIdAndItemTypeAndEquipped(Long userId, ItemType type, boolean equipped);
+    List<UserItem> findByUserIdAndEquipped(Long userId, boolean equipped);
 }

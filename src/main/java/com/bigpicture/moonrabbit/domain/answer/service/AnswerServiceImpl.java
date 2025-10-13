@@ -6,6 +6,8 @@ import com.bigpicture.moonrabbit.domain.answer.entity.Answer;
 import com.bigpicture.moonrabbit.domain.answer.repository.AnswerRepository;
 import com.bigpicture.moonrabbit.domain.board.entity.Board;
 import com.bigpicture.moonrabbit.domain.board.repository.BoardRepository;
+import com.bigpicture.moonrabbit.domain.item.dto.EquippedItemDTO;
+import com.bigpicture.moonrabbit.domain.item.service.UserItemService;
 import com.bigpicture.moonrabbit.domain.point.Point;
 import com.bigpicture.moonrabbit.domain.trust.Trust;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
@@ -26,7 +28,7 @@ public class AnswerServiceImpl implements AnswerService {
     private final AnswerRepository answerRepository;
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
-    private final UserService userService;
+    private final UserItemService userItemService;
 
     @Override
     public AnswerResponseDTO save(AnswerRequestDTO answerDTO, Long userId, Long boardId) {
@@ -51,8 +53,8 @@ public class AnswerServiceImpl implements AnswerService {
 
 
         Answer savedAnswer = answerRepository.save(answer);
-
-        return new AnswerResponseDTO(savedAnswer, user.getId());
+        List<EquippedItemDTO> equippedItems = userItemService.getEquippedItems(userId);
+        return new AnswerResponseDTO(savedAnswer, user.getId(), equippedItems);
     }
 
     @Override
@@ -68,7 +70,8 @@ public class AnswerServiceImpl implements AnswerService {
 
         answer.setContent(answerDTO.getContent());
         Answer savedAnswer = answerRepository.save(answer);
-        return new AnswerResponseDTO(savedAnswer, user.getId());
+        List<EquippedItemDTO> equippedItems = userItemService.getEquippedItems(userId);
+        return new AnswerResponseDTO(savedAnswer, user.getId(), equippedItems);
     }
 
     @Override
@@ -85,16 +88,17 @@ public class AnswerServiceImpl implements AnswerService {
 
         user.changePoint(Point.DELETE_ANSWER.getValue());
         answerRepository.delete(answer);
-        return new AnswerResponseDTO(answer, user.getId());
+        return new AnswerResponseDTO(answer, user.getId(), null);
     }
 
     @Override
     public List<AnswerResponseDTO> getAnswersByBoard(Long boardId, Long currentUserId) {
         List<Answer> answers = answerRepository.findByBoardId(boardId);
 
+        List<EquippedItemDTO> equippedItems = userItemService.getEquippedItems(currentUserId);
         // 기본 정렬이 필요하다면 정렬 추가 (예: 최신순 or 부모-자식 순)
         return answers.stream()
-                .map(answer -> new AnswerResponseDTO(answer, currentUserId))
+                .map(answer -> new AnswerResponseDTO(answer, currentUserId, equippedItems))
                 .collect(Collectors.toList());
     }
 

@@ -67,7 +67,7 @@ public class SpringConfig {
 
     @Bean
     public UserService userService() {
-        return new UserServiceImpl(userRepository, passwordEncoder, jwtGenerator, smsRepository);
+        return new UserServiceImpl(userRepository, passwordEncoder, jwtGenerator, smsRepository, userItemService());
     }
 
     @Bean
@@ -76,13 +76,13 @@ public class SpringConfig {
     }
 
     @Bean
-    public BoardService boardService(UserService userService) {
-        return new BoardServiceImpl(boardRepository, userRepository, userService());
+    public BoardService boardService() {
+        return new BoardServiceImpl(boardRepository, userRepository, userService(), userItemService());
     }
 
     @Bean
     public AnswerService answerService() {
-        return new AnswerServiceImpl(answerRepository, boardRepository, userRepository, userService());
+        return new AnswerServiceImpl(answerRepository, boardRepository, userRepository, userItemService());
     }
 
     @Bean
@@ -97,12 +97,12 @@ public class SpringConfig {
 
     @Bean
     public LikeService likeService() {
-        return new LikeServiceImpl(answerRepository, likesRepository, userRepository);
+        return new LikeServiceImpl(answerRepository, likesRepository, userRepository, userItemService());
     }
 
     @Bean
     public BoardLikeService boardLikeService() {
-        return new BoardLikeServiceImpl(boardLikeRepository, boardRepository, userRepository, userService());
+        return new BoardLikeServiceImpl(boardLikeRepository, boardRepository, userRepository, userService(), boardService());
     }
 
     @Bean
@@ -112,12 +112,12 @@ public class SpringConfig {
 
     @Bean
     public AdminService adminService() {
-        return new AdminServiceImpl(userRepository, boardRepository, userService());
+        return new AdminServiceImpl(userRepository, boardRepository, boardService());
     }
 
     @Bean
     public UserItemService userItemService() {
-        return new UserItemServiceImpl(userItemRepository, userRepository, itemRepository, userService());
+        return new UserItemServiceImpl(userItemRepository, userRepository, itemRepository);
     }
 
     @Bean

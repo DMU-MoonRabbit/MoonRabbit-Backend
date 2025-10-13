@@ -5,6 +5,8 @@ import com.bigpicture.moonrabbit.domain.board.dto.BoardRequestDTO;
 import com.bigpicture.moonrabbit.domain.board.dto.BoardResponseDTO;
 import com.bigpicture.moonrabbit.domain.board.entity.Board;
 import com.bigpicture.moonrabbit.domain.board.service.BoardService;
+import com.bigpicture.moonrabbit.domain.item.dto.EquippedItemDTO;
+import com.bigpicture.moonrabbit.domain.item.service.UserItemService;
 import com.bigpicture.moonrabbit.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -16,6 +18,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/boards")
@@ -23,6 +27,7 @@ public class BoardController {
     private final BoardService boardService;
     private final UserService userService;
     private final AnswerService answerService;
+    private final UserItemService userItemService;
 
     @GetMapping("/save")
     public String save() {
@@ -99,7 +104,12 @@ public class BoardController {
         String email = authentication.getName();
         Long userId = userService.getUserIdByEmail(email);
 
-        Board updatedBoard = answerService.selectAnswer(boardId, answerId, userId);
-        return ResponseEntity.ok(new BoardResponseDTO(updatedBoard, userId));
+        answerService.selectAnswer(boardId, answerId, userId);
+
+        // 채택 후 최신화된 게시글 정보를 DTO로 변환하여 반환
+        BoardResponseDTO updatedBoardResponse = boardService.selectOne(boardId);
+
+
+        return ResponseEntity.ok(updatedBoardResponse);
     }
 }
