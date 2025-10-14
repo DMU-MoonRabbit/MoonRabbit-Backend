@@ -113,7 +113,6 @@ public class AnswerServiceImpl implements AnswerService {
     public List<AnswerResponseDTO> getAnswersByBoard(Long boardId, Long currentUserId) {
         List<Answer> answers = answerRepository.findByBoardId(boardId);
 
-        List<EquippedItemDTO> equippedItems = userItemService.getEquippedItems(currentUserId);
         // 기본 정렬이 필요하다면 정렬 추가 (예: 최신순 or 부모-자식 순)
         return answers.stream()
                 .map(answer ->
