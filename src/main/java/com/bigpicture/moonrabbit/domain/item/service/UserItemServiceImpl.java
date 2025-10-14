@@ -1,5 +1,6 @@
 package com.bigpicture.moonrabbit.domain.item.service;
 
+import com.bigpicture.moonrabbit.domain.item.dto.EquippedItemDTO;
 import com.bigpicture.moonrabbit.domain.item.dto.UserItemResponseDTO;
 import com.bigpicture.moonrabbit.domain.item.entity.Item;
 import com.bigpicture.moonrabbit.domain.item.entity.UserItem;
@@ -20,13 +21,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class UserItemServiceImpl implements UserItemService{
     private final UserItemRepository userItemRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
-    private final UserService userService;
+
 
     @Override
     public Page<UserItemResponseDTO> getUserItems(Long userId, int page, int size) {
@@ -85,8 +88,9 @@ public class UserItemServiceImpl implements UserItemService{
         // 1. 인증된 사용자 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-        User currentUser = userService.getUserByEmail(email); // 또는 userId
 
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         UserItem userItem = userItemRepository.findById(userItemId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
 
@@ -96,9 +100,12 @@ public class UserItemServiceImpl implements UserItemService{
         }
 
         // 동일 타입의 다른 아이템이 장착되어 있으면 해제
-        userItemRepository.findByUserIdAndItemTypeAndEquipped(userItem.getUser().getId(),
-                        userItem.getItem().getType(), true)
-                .forEach(ui -> ui.setEquipped(false));
+        List<UserItem> equippedItems = userItemRepository.findByUserIdAndItemTypeAndEquipped(userItem.getUser().getId(),
+                        userItem.getItem().getType(), true);
+        for (UserItem ui : equippedItems) {
+            ui.setEquipped(false);
+            userItemRepository.save(ui); // 변경 사항 저장
+        }
 
         userItem.setEquipped(true);
         return new UserItemResponseDTO(userItem, "아이템이 장착되었습니다.");
@@ -109,7 +116,9 @@ public class UserItemServiceImpl implements UserItemService{
     public UserItemResponseDTO unequipItem(Long userItemId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-        User currentUser = userService.getUserByEmail(email);
+
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         UserItem userItem = userItemRepository.findById(userItemId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
@@ -120,6 +129,18 @@ public class UserItemServiceImpl implements UserItemService{
         }
 
         userItem.setEquipped(false);
-        return new UserItemResponseDTO(userItem, "아이템이 장착해제 되었습니다.");
+        UserItem savedItem = userItemRepository.save(userItem);
+        return new UserItemResponseDTO(savedItem, "아이템이 장착해제 되었습니다.");
+    }
+
+    @Override
+    public List<EquippedItemDTO> getEquippedItems(Long userId) {
+        return userItemRepository.findByUserIdAndEquipped(userId, true) // equipped가 true인 아이템만 조회
+                .stream()
+                .map(userItem -> new EquippedItemDTO(
+                        userItem.getItem().getType(),
+                        userItem.getItem().getImageUrl()
+                ))
+                .collect(Collectors.toList());
     }
 }

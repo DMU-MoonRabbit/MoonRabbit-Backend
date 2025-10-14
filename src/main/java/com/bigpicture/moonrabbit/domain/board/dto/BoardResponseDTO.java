@@ -2,11 +2,10 @@ package com.bigpicture.moonrabbit.domain.board.dto;
 
 import com.bigpicture.moonrabbit.domain.answer.dto.AnswerResponseDTO;
 import com.bigpicture.moonrabbit.domain.board.entity.Board;
-import com.bigpicture.moonrabbit.domain.user.entity.User;
+import com.bigpicture.moonrabbit.domain.item.dto.EquippedItemDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,25 +22,24 @@ public class BoardResponseDTO {
     private String profileImg;
     private Long selectedAnswerId;
     private int likeCount;
+    private List<EquippedItemDTO> equippedItems;
 
-
-    public BoardResponseDTO(Board board, Long currentUserId) {
+    public BoardResponseDTO(Board board, Long currentUserId, List<EquippedItemDTO> equippedItems, List<AnswerResponseDTO> answerDTOs) {
         this.title = board.getTitle();
         this.boardId = board.getId();
         this.userId = board.getUser().getId();
         this.content = board.getContent();
         this.category = board.getCategory();
         this.likeCount = board.getLikeCount();
-        this.answers = board.getAnswers().stream()
-                .map(answer -> new AnswerResponseDTO(answer, currentUserId))
-                .collect(Collectors.toList());
-        // 선택된 댓글이 있으면 ID 저장
+        this.answers = answerDTOs;
+
         if (board.getSelectedAnswer() != null) {
             this.selectedAnswerId = board.getSelectedAnswer().getId();
         }
         if (board.getUser() != null) {
             this.nickname = board.isAnonymous() ? board.getAnonymousNickname() : board.getUser().getNickname();
             this.profileImg = board.getUser().getProfileImg();
+            this.equippedItems = equippedItems;
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.bigpicture.moonrabbit.domain.user.service;
 
+import com.bigpicture.moonrabbit.domain.item.dto.EquippedItemDTO;
+import com.bigpicture.moonrabbit.domain.item.service.UserItemService;
 import com.bigpicture.moonrabbit.domain.sms.entity.Sms;
 import com.bigpicture.moonrabbit.domain.sms.repository.SmsRepository;
 import com.bigpicture.moonrabbit.domain.user.dto.UserRankingDTO;
@@ -17,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.bigpicture.moonrabbit.global.exception.CustomException;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
@@ -28,6 +31,8 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder; // 비밀번호 암호화 확인용
     private final JwtGenerator jwtGenerator; // JWT 생성기
     private final SmsRepository smsRepository;
+    private final UserItemService userItemService;
+
     private static final String[] ADJECTIVES = {
             "행복한", "용감한", "느긋한", "귀여운", "기발한", "지혜로운", "빛나는", "엉뚱한", "차분한"
     };
@@ -114,7 +119,10 @@ public class UserServiceImpl implements UserService {
     public Page<UserRankingDTO> getTotalPointRanking(int page, int size) {
         Pageable pageable = PageRequest.of(page, size); // 0-based 페이지
         return userRepository.findAllByOrderByTotalPointDesc(pageable)
-                .map(UserRankingDTO::new); // 엔티티 → DTO 변환
+                .map(user -> {
+                    List<EquippedItemDTO> equippedItems = userItemService.getEquippedItems(user.getId()); // 추가
+                    return new UserRankingDTO(user, equippedItems); // 수정
+                }); // 엔티티 → DTO 변환
     }
 
     @Override
@@ -122,7 +130,10 @@ public class UserServiceImpl implements UserService {
     public Page<UserRankingDTO> getTrustPointRanking(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return userRepository.findAllByOrderByTrustPointDesc(pageable)
-                .map(UserRankingDTO::new);
+                .map(user -> {
+                    List<EquippedItemDTO> equippedItems = userItemService.getEquippedItems(user.getId()); // 추가
+                    return new UserRankingDTO(user, equippedItems); // 수정
+                });
     }
 
 

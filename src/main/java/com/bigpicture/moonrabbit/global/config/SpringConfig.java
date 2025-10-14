@@ -13,6 +13,10 @@ import com.bigpicture.moonrabbit.domain.boardLike.service.BoardLikeService;
 import com.bigpicture.moonrabbit.domain.boardLike.service.BoardLikeServiceImpl;
 import com.bigpicture.moonrabbit.domain.dailyquestion.repository.DailyAnswerRepository;
 import com.bigpicture.moonrabbit.domain.dailyquestion.repository.DailyQuestionRepository;
+import com.bigpicture.moonrabbit.domain.dailyquestion.service.DailyAnswerServiceImpl;
+import com.bigpicture.moonrabbit.domain.dailyquestion.service.DailyQuestionServiceImpl;
+import com.bigpicture.moonrabbit.domain.dailyquestion.repository.DailyAnswerRepository;
+import com.bigpicture.moonrabbit.domain.dailyquestion.repository.DailyQuestionRepository;
 import com.bigpicture.moonrabbit.domain.dailyquestion.service.DailyAnswerService;
 import com.bigpicture.moonrabbit.domain.dailyquestion.service.DailyAnswerServiceImpl;
 import com.bigpicture.moonrabbit.domain.dailyquestion.service.DailyQuestionService;
@@ -73,7 +77,7 @@ public class SpringConfig {
 
     @Bean
     public UserService userService() {
-        return new UserServiceImpl(userRepository, passwordEncoder, jwtGenerator, smsRepository);
+        return new UserServiceImpl(userRepository, passwordEncoder, jwtGenerator, smsRepository, userItemService());
     }
 
     @Bean
@@ -82,13 +86,13 @@ public class SpringConfig {
     }
 
     @Bean
-    public BoardService boardService(UserService userService) {
-        return new BoardServiceImpl(boardRepository, userRepository, userService());
+    public BoardService boardService() {
+        return new BoardServiceImpl(boardRepository, userRepository, userService(), userItemService());
     }
 
     @Bean
     public AnswerService answerService() {
-        return new AnswerServiceImpl(answerRepository, boardRepository, userRepository, notificationService(), notificationRepository);
+        return new AnswerServiceImpl(answerRepository, boardRepository, userRepository, userItemService(), notificationService(), notificationRepository);
     }
 
     @Bean
@@ -103,12 +107,12 @@ public class SpringConfig {
 
     @Bean
     public LikeService likeService() {
-        return new LikeServiceImpl(answerRepository, likesRepository, userRepository);
+        return new LikeServiceImpl(answerRepository, likesRepository, userRepository, userItemService());
     }
 
     @Bean
     public BoardLikeService boardLikeService() {
-        return new BoardLikeServiceImpl(boardLikeRepository, boardRepository, userRepository, userService());
+        return new BoardLikeServiceImpl(boardLikeRepository, boardRepository, userRepository, userService(), boardService());
     }
 
     @Bean
@@ -118,24 +122,23 @@ public class SpringConfig {
 
     @Bean
     public AdminService adminService() {
-        return new AdminServiceImpl(userRepository, boardRepository, userService());
+        return new AdminServiceImpl(userRepository, boardRepository, boardService());
     }
 
     @Bean
     public UserItemService userItemService() {
-        return new UserItemServiceImpl(userItemRepository, userRepository, itemRepository, userService());
+        return new UserItemServiceImpl(userItemRepository, userRepository, itemRepository);
     }
 
     @Bean
-    public DailyQuestionService dailyQuestionService() {
+    public DailyQuestionServiceImpl dailyQuestionService() {
         return new DailyQuestionServiceImpl(dailyQuestionRepository);
     }
 
     @Bean
-    public DailyAnswerService dailyAnswerService() {
+    public DailyAnswerServiceImpl dailyAnswerService() {
         return new DailyAnswerServiceImpl(dailyAnswerRepository, dailyQuestionRepository, userService());
     }
-
     @Bean
     public NotificationService notificationService(){
         return new NotificationServiceImpl(notificationRepository);
