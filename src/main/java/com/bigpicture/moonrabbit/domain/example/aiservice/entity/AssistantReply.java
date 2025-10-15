@@ -4,6 +4,8 @@ import com.bigpicture.moonrabbit.domain.board.entity.Board;
 import com.bigpicture.moonrabbit.domain.example.aiservice.enums.AssistantCategory;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -20,6 +22,7 @@ public class AssistantReply {
     // 게시글과 1:1 관계
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id", unique = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Board board;
 
     @Enumerated(EnumType.STRING)
