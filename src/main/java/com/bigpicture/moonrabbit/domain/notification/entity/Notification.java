@@ -1,6 +1,7 @@
 package com.bigpicture.moonrabbit.domain.notification.entity;
 
 import com.bigpicture.moonrabbit.domain.answer.entity.Answer;
+import com.bigpicture.moonrabbit.domain.example.aiservice.entity.AssistantReply;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
