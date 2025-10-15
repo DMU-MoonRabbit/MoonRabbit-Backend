@@ -72,6 +72,11 @@ dependencies {
     // AWS SDK v2
     implementation 'software.amazon.awssdk:s3:2.25.32'
     implementation 'software.amazon.awssdk:sts:2.25.32'
+
+
+	//ocr
+	implementation 'org.apache.pdfbox:pdfbox:2.0.29'
+	implementation 'net.sourceforge.tess4j:tess4j:5.4.0'
 }
 
 // LangChain4j BOM
