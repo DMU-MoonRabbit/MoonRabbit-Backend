@@ -22,7 +22,6 @@ public class AssistantReply {
     // 게시글과 1:1 관계
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id", unique = true)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Board board;
 
     @Enumerated(EnumType.STRING)

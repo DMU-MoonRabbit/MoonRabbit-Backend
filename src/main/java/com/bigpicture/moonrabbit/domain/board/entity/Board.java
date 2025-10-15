@@ -2,6 +2,7 @@ package com.bigpicture.moonrabbit.domain.board.entity;
 
 import com.bigpicture.moonrabbit.domain.answer.entity.Answer;
 import com.bigpicture.moonrabbit.domain.boardLike.entity.BoardLike;
+import com.bigpicture.moonrabbit.domain.example.aiservice.entity.AssistantReply;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -43,6 +44,8 @@ public class Board {
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true )
     private List<Answer> answers = new ArrayList<>();
 
+    @OneToOne(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private AssistantReply assistantReply;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "selected_answer_id")
