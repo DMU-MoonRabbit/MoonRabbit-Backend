@@ -2,6 +2,7 @@ package com.bigpicture.moonrabbit.domain.board.service;
 
 import com.bigpicture.moonrabbit.domain.board.dto.BoardRequestDTO;
 import com.bigpicture.moonrabbit.domain.board.dto.BoardResponseDTO;
+import com.bigpicture.moonrabbit.domain.board.entity.Board;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -18,6 +19,8 @@ public interface BoardService {
     BoardResponseDTO selectOne(Long id);
 
     Page<BoardResponseDTO> selectPaged(int page, int size);
+
+    BoardResponseDTO toDto(Board board, Long currentUserId);
 
     Page<BoardResponseDTO> selectPagedByUser(Long userId, int page, int size);
 }

@@ -6,13 +6,15 @@ import com.bigpicture.moonrabbit.domain.answer.entity.Answer;
 import com.bigpicture.moonrabbit.domain.answer.repository.AnswerRepository;
 import com.bigpicture.moonrabbit.domain.board.entity.Board;
 import com.bigpicture.moonrabbit.domain.board.repository.BoardRepository;
+import com.bigpicture.moonrabbit.domain.item.dto.EquippedItemDTO;
+import com.bigpicture.moonrabbit.domain.item.service.UserItemService;
 import com.bigpicture.moonrabbit.domain.notification.dto.NotificationResponseDTO;
 import com.bigpicture.moonrabbit.domain.notification.repository.NotificationRepository;
 import com.bigpicture.moonrabbit.domain.notification.service.NotificationService;
 import com.bigpicture.moonrabbit.domain.point.Point;
 import com.bigpicture.moonrabbit.domain.trust.Trust;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
-import com.bigpicture.moonrabbit.domain.user.repository.UserRepository; 
+import com.bigpicture.moonrabbit.domain.user.repository.UserRepository;
 import com.bigpicture.moonrabbit.global.exception.CustomException;
 import com.bigpicture.moonrabbit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class AnswerServiceImpl implements AnswerService {
     private final AnswerRepository answerRepository;
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
+    private final UserItemService userItemService;
     private final NotificationService notificationService;
     private final NotificationRepository notificationRepository;
 
@@ -52,6 +55,7 @@ public class AnswerServiceImpl implements AnswerService {
             answer.setParent(parent);
         }
 
+
         Answer savedAnswer = answerRepository.save(answer);
 
         if (!board.getUser().getId().equals(userId)) { // 자기 댓글이면 제외
@@ -67,7 +71,8 @@ public class AnswerServiceImpl implements AnswerService {
             notificationService.sendNotification(board.getUser().getId(), dto);
         }
 
-        return new AnswerResponseDTO(savedAnswer, user.getId());
+        List<EquippedItemDTO> equippedItems = userItemService.getEquippedItems(userId);
+        return new AnswerResponseDTO(savedAnswer, user.getId(), equippedItems);
     }
 
     @Override
@@ -83,7 +88,8 @@ public class AnswerServiceImpl implements AnswerService {
 
         answer.setContent(answerDTO.getContent());
         Answer savedAnswer = answerRepository.save(answer);
-        return new AnswerResponseDTO(savedAnswer, user.getId());
+        List<EquippedItemDTO> equippedItems = userItemService.getEquippedItems(userId);
+        return new AnswerResponseDTO(savedAnswer, user.getId(), equippedItems);
     }
 
     @Override
@@ -100,7 +106,7 @@ public class AnswerServiceImpl implements AnswerService {
 
         user.changePoint(Point.DELETE_ANSWER.getValue());
         answerRepository.delete(answer);
-        return new AnswerResponseDTO(answer, user.getId());
+        return new AnswerResponseDTO(answer, user.getId(), null);
     }
 
     @Override
@@ -109,7 +115,11 @@ public class AnswerServiceImpl implements AnswerService {
 
         // 기본 정렬이 필요하다면 정렬 추가 (예: 최신순 or 부모-자식 순)
         return answers.stream()
-                .map(answer -> new AnswerResponseDTO(answer, currentUserId))
+                .map(answer ->
+                {
+                    List<EquippedItemDTO> equippedItems = userItemService.getEquippedItems(answer.getUser().getId());
+                    return new AnswerResponseDTO(answer, currentUserId, equippedItems);
+                })
                 .collect(Collectors.toList());
     }
 

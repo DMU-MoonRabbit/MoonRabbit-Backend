@@ -3,6 +3,8 @@ package com.bigpicture.moonrabbit.domain.like.service;
 import com.bigpicture.moonrabbit.domain.answer.dto.AnswerResponseDTO;
 import com.bigpicture.moonrabbit.domain.answer.entity.Answer;
 import com.bigpicture.moonrabbit.domain.answer.repository.AnswerRepository;
+import com.bigpicture.moonrabbit.domain.item.dto.EquippedItemDTO;
+import com.bigpicture.moonrabbit.domain.item.service.UserItemService;
 import com.bigpicture.moonrabbit.domain.like.entity.Likes;
 import com.bigpicture.moonrabbit.domain.like.repository.LikesRepository;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
@@ -12,11 +14,14 @@ import com.bigpicture.moonrabbit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 public class LikeServiceImpl implements LikeService {
     private final AnswerRepository answerRepository;
     private final LikesRepository likesRepository;
     private final UserRepository userRepository;
+    private final UserItemService userItemService;
 
     // 좋아요
     @Override
@@ -46,6 +51,10 @@ public class LikeServiceImpl implements LikeService {
     public AnswerResponseDTO getAnswerDto(Long answerId, Long currentUserId) {
         Answer answer = answerRepository.findById(answerId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ANSWER_NOT_FOUND));
-        return new AnswerResponseDTO(answer, currentUserId);
+
+        // 답변 작성자의 장착 아이템 정보를 가져옴
+        List<EquippedItemDTO> equippedItems = userItemService.getEquippedItems(answer.getUser().getId());
+
+        return new AnswerResponseDTO(answer, currentUserId, equippedItems);
     }
 }

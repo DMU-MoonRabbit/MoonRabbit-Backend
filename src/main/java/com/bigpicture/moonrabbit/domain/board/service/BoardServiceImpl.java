@@ -1,11 +1,14 @@
 package com.bigpicture.moonrabbit.domain.board.service;
 
+import com.bigpicture.moonrabbit.domain.answer.dto.AnswerResponseDTO;
 import com.bigpicture.moonrabbit.domain.answer.entity.Answer;
 import com.bigpicture.moonrabbit.domain.answer.repository.AnswerRepository;
 import com.bigpicture.moonrabbit.domain.board.dto.BoardRequestDTO;
 import com.bigpicture.moonrabbit.domain.board.dto.BoardResponseDTO;
 import com.bigpicture.moonrabbit.domain.board.entity.Board;
 import com.bigpicture.moonrabbit.domain.board.repository.BoardRepository;
+import com.bigpicture.moonrabbit.domain.item.dto.EquippedItemDTO;
+import com.bigpicture.moonrabbit.domain.item.service.UserItemService;
 import com.bigpicture.moonrabbit.domain.point.Point;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
 import com.bigpicture.moonrabbit.domain.user.repository.UserRepository;
@@ -31,6 +34,7 @@ public class BoardServiceImpl implements BoardService {
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final UserItemService userItemService;
 
     @Override
     public BoardResponseDTO createBoard(BoardRequestDTO boardDTO, Long userId) {
@@ -51,7 +55,8 @@ public class BoardServiceImpl implements BoardService {
         user.changePoint(Point.CREATE_BOARD.getValue());
         board.setUser(user);
         Board savedBoard = boardRepository.save(board);
-        return new BoardResponseDTO(savedBoard, userId);
+        List<EquippedItemDTO> equippedItems = userItemService.getEquippedItems(userId);
+        return toDto(savedBoard, userId);
     }
     @Override
     public BoardResponseDTO updateBoard(Long boardId, BoardRequestDTO boardDTO, Long userId) {
@@ -65,7 +70,8 @@ public class BoardServiceImpl implements BoardService {
         }
         board.setUser(user);
         Board updatedBoard = boardRepository.save(board);
-        return new BoardResponseDTO(updatedBoard, userId);
+        List<EquippedItemDTO> equippedItems = userItemService.getEquippedItems(userId);
+        return toDto(updatedBoard, userId);
     }
 
 
@@ -78,8 +84,8 @@ public class BoardServiceImpl implements BoardService {
         }
         user.changePoint(Point.DELETE_BOARD.getValue());
         boardRepository.delete(board);
-
-        return new BoardResponseDTO(board, userId);
+        List<EquippedItemDTO> equippedItems = userItemService.getEquippedItems(userId);
+        return toDto(board, userId);
     }
 
     @Override
@@ -89,25 +95,54 @@ public class BoardServiceImpl implements BoardService {
         String email = authentication.getName();
         Long currentUserId = userService.getUserIdByEmail(email);
 
+        List<EquippedItemDTO> equippedItems = userItemService.getEquippedItems(currentUserId);
         return boardRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"))
                 .stream()
-                .map(board -> new BoardResponseDTO(board, currentUserId))
+                .map(board -> toDto(board, currentUserId))
                 .collect(Collectors.toList());
     }
 
     @Override
     public BoardResponseDTO selectOne(Long id) {
-
         Board board = boardRepository.findWithCommentsById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
-        Long userId = board.getUser().getId();
-        return new BoardResponseDTO(board, userId);
+
+        // 1. 게시글 작성자의 장착 아이템 조회
+        List<EquippedItemDTO> boardAuthorEquippedItems = userItemService.getEquippedItems(board.getUser().getId());
+
+        // 2. 각 댓글을 순회하며 댓글 DTO(AnswerResponseDTO) 리스트를 생성
+        List<AnswerResponseDTO> answerDTOs = board.getAnswers().stream()
+                .map(answer -> {
+                    // 2-1. 각 댓글 작성자의 장착 아이템 조회
+                    List<EquippedItemDTO> answerAuthorEquippedItems = userItemService.getEquippedItems(answer.getUser().getId());
+                    // 2-2. 수정된 AnswerResponseDTO 생성자 호출
+                    return new AnswerResponseDTO(answer, board.getUser().getId(), answerAuthorEquippedItems);
+                })
+                .collect(Collectors.toList());
+
+        // 3. 모든 정보를 담아 BoardResponseDTO 생성
+        return new BoardResponseDTO(board, board.getUser().getId(), boardAuthorEquippedItems, answerDTOs);
     }
 
     @Override
     public Page<BoardResponseDTO> selectPaged(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        return boardRepository.findAll(pageable).map(board -> new BoardResponseDTO(board, null));
+        return boardRepository.findAll(pageable).map(board -> toDto(board, null));
+    }
+
+
+    @Override
+    public BoardResponseDTO toDto(Board board, Long currentUserId) {
+        List<EquippedItemDTO> boardAuthorEquippedItems = userItemService.getEquippedItems(board.getUser().getId());
+
+        List<AnswerResponseDTO> answerDTOs = board.getAnswers().stream()
+                .map(answer -> {
+                    List<EquippedItemDTO> answerAuthorEquippedItems = userItemService.getEquippedItems(answer.getUser().getId());
+                    return new AnswerResponseDTO(answer, currentUserId, answerAuthorEquippedItems);
+                })
+                .collect(Collectors.toList());
+
+        return new BoardResponseDTO(board, currentUserId, boardAuthorEquippedItems, answerDTOs);
     }
 
     @Override
@@ -115,6 +150,7 @@ public class BoardServiceImpl implements BoardService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         return boardRepository.findByUser_Id(userId, pageable)
-                .map(board -> new BoardResponseDTO(board, userId));
+                .map(board -> toDto(board, userId));
     }
 }
+

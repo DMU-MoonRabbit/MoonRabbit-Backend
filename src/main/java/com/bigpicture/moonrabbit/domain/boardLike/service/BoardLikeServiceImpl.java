@@ -3,8 +3,11 @@ package com.bigpicture.moonrabbit.domain.boardLike.service;
 import com.bigpicture.moonrabbit.domain.board.dto.BoardResponseDTO;
 import com.bigpicture.moonrabbit.domain.board.entity.Board;
 import com.bigpicture.moonrabbit.domain.board.repository.BoardRepository;
+import com.bigpicture.moonrabbit.domain.board.service.BoardService;
 import com.bigpicture.moonrabbit.domain.boardLike.entity.BoardLike;
 import com.bigpicture.moonrabbit.domain.boardLike.repository.BoardLikeRepository;
+import com.bigpicture.moonrabbit.domain.item.dto.EquippedItemDTO;
+import com.bigpicture.moonrabbit.domain.item.service.UserItemService;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
 import com.bigpicture.moonrabbit.domain.user.repository.UserRepository;
 import com.bigpicture.moonrabbit.domain.user.service.UserService;
@@ -19,6 +22,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 public class BoardLikeServiceImpl implements BoardLikeService{
 
@@ -26,6 +31,7 @@ public class BoardLikeServiceImpl implements BoardLikeService{
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final BoardService boardService;
 
     public void likeBoard(Long boardId, Long userId) {
         if (boardLikeRepository.existsByBoardIdAndUserId(boardId, userId)) {
@@ -59,6 +65,6 @@ public class BoardLikeServiceImpl implements BoardLikeService{
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<BoardLike> likedBoards = boardLikeRepository.findByUserId(currentUserId, pageable);
 
-        return likedBoards.map(boardLike -> new BoardResponseDTO(boardLike.getBoard(), currentUserId));
+        return likedBoards.map(boardLike -> boardService.selectOne(boardLike.getBoard().getId()));
     }
 }
