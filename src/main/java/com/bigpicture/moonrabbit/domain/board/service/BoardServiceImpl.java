@@ -108,8 +108,8 @@ public class BoardServiceImpl implements BoardService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Long currentUserId = null; // 기본값은 null로 설정
 
-        // 인증 정보가 있고, 익명 사용자가 아닐 경우에만 ID를 가져옵니다.
-        if (authentication != null ) {
+        
+        if (!"anonymousUser".equals(authentication.getPrincipal().toString())) {
             String email = authentication.getName();
             currentUserId = userService.getUserIdByEmail(email);
         }
