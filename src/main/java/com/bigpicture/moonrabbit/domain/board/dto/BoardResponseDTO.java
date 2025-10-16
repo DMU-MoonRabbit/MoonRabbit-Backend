@@ -23,6 +23,7 @@ public class BoardResponseDTO {
     private Long selectedAnswerId;
     private int likeCount;
     private List<EquippedItemDTO> equippedItems;
+    private boolean likedByMe;
 
     public BoardResponseDTO(Board board, Long currentUserId, List<EquippedItemDTO> equippedItems, List<AnswerResponseDTO> answerDTOs) {
         this.title = board.getTitle();
@@ -40,6 +41,12 @@ public class BoardResponseDTO {
             this.nickname = board.isAnonymous() ? board.getAnonymousNickname() : board.getUser().getNickname();
             this.profileImg = board.getUser().getProfileImg();
             this.equippedItems = equippedItems;
+        }
+        if (currentUserId != null) {
+            this.likedByMe = board.getLikes().stream()
+                    .anyMatch(like -> like.getUser().getId().equals(currentUserId));
+        } else {
+            this.likedByMe = false;
         }
     }
 }

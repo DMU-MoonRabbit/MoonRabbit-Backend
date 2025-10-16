@@ -104,6 +104,11 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public BoardResponseDTO selectOne(Long id) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Long currentUserId = userService.getUserIdByEmail(email);
+
         Board board = boardRepository.findWithCommentsById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
 
@@ -121,7 +126,7 @@ public class BoardServiceImpl implements BoardService {
                 .collect(Collectors.toList());
 
         // 3. 모든 정보를 담아 BoardResponseDTO 생성
-        return new BoardResponseDTO(board, board.getUser().getId(), boardAuthorEquippedItems, answerDTOs);
+        return new BoardResponseDTO(board, currentUserId, boardAuthorEquippedItems, answerDTOs);
     }
 
     @Override
