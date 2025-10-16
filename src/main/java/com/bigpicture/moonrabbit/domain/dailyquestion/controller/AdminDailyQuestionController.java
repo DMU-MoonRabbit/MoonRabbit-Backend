@@ -14,7 +14,7 @@ public class AdminDailyQuestionController {
     private final DailyQuestionService dailyQuestionService;
 
     @Operation(summary = "어드민 질문 생성", description = "관리자가 질문 생성")
-    @PostMapping("/api/admin/daily-questions")
+    @PostMapping("/create")
     public DailyQuestion createDailyQuestion(
             @RequestBody DailyQuestionRequestDTO requestDTO) {
         return dailyQuestionService.createOrReplaceForDate(requestDTO);
