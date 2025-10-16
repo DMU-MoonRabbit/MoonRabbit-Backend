@@ -28,7 +28,7 @@ public class ReportController {
     private final UserRepository userRepository;
 
     @Operation(summary = "신고 생성")
-    @PostMapping("/create")
+    @PostMapping("api/create")
     public ResponseEntity<ReportResponseDTO> createReport(@RequestBody ReportRequestDTO dto) {
         // 인증된 사용자 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

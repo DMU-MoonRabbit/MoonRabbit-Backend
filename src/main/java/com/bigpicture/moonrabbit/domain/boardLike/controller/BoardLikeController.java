@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/likes")
+@RequestMapping("api/likes")
 public class BoardLikeController {
 
     private final BoardLikeService boardLikeService;
