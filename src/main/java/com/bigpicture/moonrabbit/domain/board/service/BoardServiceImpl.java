@@ -107,7 +107,13 @@ public class BoardServiceImpl implements BoardService {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-        Long currentUserId = userService.getUserIdByEmail(email);
+        Long currentUserId;
+        if (email == null) {
+            currentUserId = null;
+        } else{
+            currentUserId = userService.getUserIdByEmail(email);
+        }
+
 
         Board board = boardRepository.findWithCommentsById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
