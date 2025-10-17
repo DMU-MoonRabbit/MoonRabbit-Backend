@@ -69,7 +69,15 @@ public class AnswerController {
     @Operation(summary = "게시글 댓글 조회", description = "게시글 ID로 댓글 목록 조회 (닉네임, 프로필, 부모ID 포함)")
     @GetMapping("/board/{boardId}")
     public ResponseEntity<List<AnswerResponseDTO>> getAnswersByBoard(@PathVariable Long boardId) {
-        List<AnswerResponseDTO> answers = answerService.getAnswersByBoard(boardId, null);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Long currentUserId = null;
+
+        if (authentication.getPrincipal() != null && !"anonymousUser".equals(authentication.getPrincipal().toString())) {
+            String email = authentication.getName();
+            currentUserId = userService.getUserIdByEmail(email);
+        }
+
+        List<AnswerResponseDTO> answers = answerService.getAnswersByBoard(boardId, currentUserId);
         return new ResponseEntity<>(answers, HttpStatus.OK);
     }
 
