@@ -34,7 +34,10 @@ public class User {
     private String provider = "common";
     private String providerId;
     private String nickname;
+
+    @Column(length = 500)
     private String profileImg;
+
     private String role = ROLE_USER;
     private int level = 1;
     private int trustPoint = 0;
