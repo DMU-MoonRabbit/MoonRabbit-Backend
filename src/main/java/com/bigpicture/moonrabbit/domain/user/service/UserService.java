@@ -33,4 +33,7 @@ public interface UserService {
     UserResponseDTO updateNickname(String email, String newNickname);
 
     void updatePassword(String email, String currentPassword, String newPassword, String newPasswordConfirm);
+
+    // [새로 추가] 프로필 이미지 URL 업데이트 메서드
+    UserResponseDTO updateProfileImage(String email, String newImageUrl);
 }
