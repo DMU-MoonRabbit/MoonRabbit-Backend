@@ -28,4 +28,9 @@ public interface UserService {
     Page<UserRankingDTO> getTotalPointRanking(int page, int size);
 
     Page<UserRankingDTO> getTrustPointRanking(int page, int size);
+
+    // 추가된 메서드
+    UserResponseDTO updateNickname(String email, String newNickname);
+
+    void updatePassword(String email, String currentPassword, String newPassword, String newPasswordConfirm);
 }
