@@ -1,11 +1,8 @@
 package com.bigpicture.moonrabbit.domain.user.controller;
 
 
-import com.bigpicture.moonrabbit.domain.user.dto.LoginRequestDTO;
-import com.bigpicture.moonrabbit.domain.user.dto.UserRankingDTO;
-import com.bigpicture.moonrabbit.domain.user.dto.UserRequestDTO;
+import com.bigpicture.moonrabbit.domain.user.dto.*;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
-import com.bigpicture.moonrabbit.domain.user.dto.UserResponseDTO;
 import com.bigpicture.moonrabbit.domain.user.service.UserService;
 import com.bigpicture.moonrabbit.global.auth.jwt.dto.JwtDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -115,4 +112,25 @@ public class UserController {
             @RequestParam(defaultValue = "10") int size) {
         return userService.getTrustPointRanking(page, size);
     }
+    @Operation(summary = "닉네임 변경", description = "로그인된 사용자의 닉네임을 변경합니다.")
+    @PatchMapping("/profile/nickname")
+    public ResponseEntity<UserResponseDTO> updateNickname(@Valid @RequestBody UpdateNicknameRequestDTO requestDTO) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserResponseDTO responseDTO = userService.updateNickname(email, requestDTO.getNewNickname());
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    @Operation(summary = "비밀번호 변경", description = "로그인된 사용자의 비밀번호를 변경합니다.")
+    @PatchMapping("/profile/password")
+    public ResponseEntity<Void> updatePassword(@Valid @RequestBody UpdatePasswordRequestDTO requestDTO) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        userService.updatePassword(
+                email,
+                requestDTO.getCurrentPassword(),
+                requestDTO.getNewPassword(),
+                requestDTO.getNewPasswordConfirm()
+        );
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

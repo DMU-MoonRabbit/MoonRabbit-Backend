@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.bigpicture.moonrabbit.global.exception.CustomException;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -136,5 +137,33 @@ public class UserServiceImpl implements UserService {
                 });
     }
 
+    @Override
+    @Transactional
+    public UserResponseDTO updateNickname(String email, String newNickname) {
+        User user = getUserByEmail(email);
+        user.setNickname(newNickname);
+        User savedUser = userRepository.save(user);
+        return new UserResponseDTO(savedUser);
+    }
+
+    @Override
+    @Transactional
+    public void updatePassword(String email, String currentPassword, String newPassword, String newPasswordConfirm) {
+        User user = getUserByEmail(email);
+
+        // 1. 현재 비밀번호가 맞는지 확인
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        // 2. 새 비밀번호와 비밀번호 확인이 일치하는지 확인
+        if (!Objects.equals(newPassword, newPasswordConfirm)) {
+            throw new CustomException(ErrorCode.PASSWORD_COFIRM_ERROR);
+        }
+
+        // 3. 새 비밀번호를 암호화하여 저장
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
 
 }
