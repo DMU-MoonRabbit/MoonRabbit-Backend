@@ -1,6 +1,8 @@
 package com.bigpicture.moonrabbit.domain.user.controller;
 
 
+import com.bigpicture.moonrabbit.domain.image.entity.FileType;
+import com.bigpicture.moonrabbit.domain.image.service.S3Service;
 import com.bigpicture.moonrabbit.domain.user.dto.*;
 import com.bigpicture.moonrabbit.domain.user.entity.User;
 import com.bigpicture.moonrabbit.domain.user.service.UserService;
@@ -15,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -23,6 +26,7 @@ import java.io.IOException;
 @RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
+    private final S3Service s3Service;
 
 
     @GetMapping("/api/admin/debug")
@@ -131,6 +135,29 @@ public class UserController {
                 requestDTO.getNewPasswordConfirm()
         );
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(summary = "프로필 이미지 변경/업로드", description = "S3에 프로필 이미지를 업로드하고 유저 정보에 반영합니다.")
+    @PostMapping("/profile/image")
+    public ResponseEntity<UserResponseDTO> updateProfileImage(
+            @RequestParam("file") MultipartFile file
+    ) {
+        // 1. 현재 사용자 이메일 및 User 엔티티 조회
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        User currentUser = userService.getUserByEmail(email);
+
+        String oldUrl = currentUser.getProfileImg(); // DB에 저장된 현재 프로필 이미지 URL 가져오기
+
+        // 2. S3에 새 파일 업로드 (이전 파일이 있다면 삭제 처리 포함)
+        // S3Service의 updateFile을 사용하여 기존 이미지를 삭제하고 새 이미지를 업로드
+        // FileType.PROFILE은 "user-profile/" 접두사를 사용합니다.
+        String newImageUrl = s3Service.updateFile(oldUrl, file, FileType.PROFILE);
+
+        // 3. UserService를 통해 DB의 프로필 이미지 URL 업데이트
+        UserResponseDTO responseDTO = userService.updateProfileImage(email, newImageUrl);
+
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
 }

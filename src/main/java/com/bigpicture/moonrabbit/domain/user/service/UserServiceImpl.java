@@ -165,5 +165,13 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
+    @Override
+    @Transactional
+    public UserResponseDTO updateProfileImage(String email, String newImageUrl) {
+        User user = getUserByEmail(email);
+        user.setProfileImg(newImageUrl);
+        User savedUser = userRepository.save(user);
+        return new UserResponseDTO(savedUser);
+    }
 
 }
