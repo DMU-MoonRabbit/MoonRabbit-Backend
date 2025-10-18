@@ -30,4 +30,29 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
     }
+
+    @Override
+    @Transactional
+    public Item updateItem(Long itemId, String newName, int newPrice, String newImageUrl) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+
+        item.setName(newName);
+        item.setPrice(newPrice);
+        item.setImageUrl(newImageUrl);
+
+        return itemRepository.save(item);
+    }
+
+    @Override
+    @Transactional
+    public void deleteItem(Long itemId) {
+        // 1. 아이템 존재 여부 확인
+        if (!itemRepository.existsById(itemId)) {
+            throw new CustomException(ErrorCode.ITEM_NOT_FOUND);
+        }
+
+        // 2. 아이템 삭제
+        itemRepository.deleteById(itemId);
+    }
 }

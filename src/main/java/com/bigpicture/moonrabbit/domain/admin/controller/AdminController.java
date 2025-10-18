@@ -8,9 +8,12 @@ import com.bigpicture.moonrabbit.domain.board.dto.BoardResponseDTO;
 import com.bigpicture.moonrabbit.domain.dailyquestion.dto.DailyQuestionRequestDTO;
 import com.bigpicture.moonrabbit.domain.dailyquestion.dto.DailyQuestionResponseDTO;
 import com.bigpicture.moonrabbit.domain.dailyquestion.service.DailyQuestionService;
+import com.bigpicture.moonrabbit.domain.item.entity.Item;
+import com.bigpicture.moonrabbit.domain.item.service.ItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
     private final AdminService adminService;
     private final DailyQuestionService dailyQuestionService;
+    private final ItemService itemService;
 
     @GetMapping("/users")
     @Operation(summary = "유저 목록 조회", description = "유저들의 목록을 조회하는 기능")
@@ -53,5 +57,24 @@ public class AdminController {
     public AdminResponseDTO deleteBoardAsAdmin(@PathVariable Long boardId) {
         adminService.deleteBoardAsAdmin(boardId);
         return new AdminResponseDTO("게시글 ID : "+boardId+" 삭제되었습니다.");
+    }
+
+    @PutMapping("/items/{itemId}")
+    @Operation(summary = "특정 아이템 정보 수정", description = "관리자가 아이템 이름, 가격, 이미지 등을 수정")
+    public ResponseEntity<Item> updateItemAsAdmin(
+            @PathVariable Long itemId,
+            @RequestParam String name,
+            @RequestParam int price,
+            @RequestParam String imageUrl
+    ) {
+        Item updatedItem = itemService.updateItem(itemId, name, price, imageUrl);
+        return ResponseEntity.ok(updatedItem);
+    }
+
+    @DeleteMapping("/items/{itemId}")
+    @Operation(summary = "특정 아이템 삭제", description = "관리자가 아이템을 영구적으로 삭제")
+    public AdminResponseDTO deleteItemAsAdmin(@PathVariable Long itemId) {
+        itemService.deleteItem(itemId);
+        return new AdminResponseDTO("아이템 ID : "+itemId+" 삭제되었습니다.");
     }
 }

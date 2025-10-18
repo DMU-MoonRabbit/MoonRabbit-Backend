@@ -6,4 +6,8 @@ import org.springframework.data.domain.Page;
 public interface ItemService {
     Page<Item> getAllItems(int page, int size);
     Item getItemDetail(Long itemId);
+
+    Item updateItem(Long itemId, String name, int price, String imageUrl);
+
+    void deleteItem(Long itemId);
 }
