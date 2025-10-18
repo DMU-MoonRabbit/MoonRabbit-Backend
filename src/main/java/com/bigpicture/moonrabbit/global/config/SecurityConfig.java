@@ -78,7 +78,7 @@ public class SecurityConfig {
                                          "https://moonrabbit-web.kro.kr"
                                          
         )); // 개발용 도메인
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true); // 필요한 경우 true 설정
 
