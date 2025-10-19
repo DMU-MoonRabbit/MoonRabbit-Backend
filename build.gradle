@@ -2,11 +2,14 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.2.5'
 	id 'io.spring.dependency-management' version '1.1.3'
-
 }
 
 group = 'com.bigpicture'
 version = '0.0.1-SNAPSHOT'
+
+tasks.withType(JavaExec) {
+	systemProperty "file.encoding", "UTF-8"
+}
 
 java {
 	toolchain {
@@ -25,68 +28,62 @@ repositories {
 }
 
 dependencies {
-	// Spring Boot 기본 웹 기능
+	// --- Spring Boot Core ---
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-
-	// JPA (Hibernate 포함)
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
-	// 유효성 검사
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-	// Spring Security
+	// --- Security & Auth ---
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
-	// JWT
+	// --- JPA (Hibernate) ---
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	// --- JWT ---
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-	// Lombok
+	// --- Lombok ---
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
-	// OpenAPI (Swagger)
+	// --- Swagger (OpenAPI) ---
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
 
-	// SMS 인증
+	// --- SMS 인증 ---
 	implementation 'net.nurigo:sdk:4.3.0'
 
-	// MySQL 드라이버
+	// --- Database ---
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	implementation 'com.mysql:mysql-connector-j:8.2.0'
 
-	// 테스트 관련
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-	//랭체인
+	// --- LangChain (LLM Framework) ---
 	implementation 'dev.langchain4j:langchain4j-spring-boot-starter'
-
 	implementation('dev.langchain4j:langchain4j-open-ai-spring-boot-starter') {
 		exclude group: 'dev.langchain4j', module: 'langchain4j-http-client-jdk'
 	}
 	implementation 'dev.langchain4j:langchain4j-reactor'
 
-    // AWS SDK v2
-    implementation 'software.amazon.awssdk:s3:2.25.32'
-    implementation 'software.amazon.awssdk:sts:2.25.32'
+	// --- AWS SDK v2 (S3/STS) ---
+	implementation 'software.amazon.awssdk:s3:2.25.32'
+	implementation 'software.amazon.awssdk:sts:2.25.32'
 
-
-	//ocr
+	// --- OCR ---
 	implementation 'org.apache.pdfbox:pdfbox:2.0.29'
 	implementation 'net.sourceforge.tess4j:tess4j:5.4.0'
+
+	// --- Test ---
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-// LangChain4j BOM
 dependencyManagement {
 	imports {
 		mavenBom "dev.langchain4j:langchain4j-bom:1.0.1"
 	}
 }
-
-
 
 tasks.named('test') {
 	useJUnitPlatform()

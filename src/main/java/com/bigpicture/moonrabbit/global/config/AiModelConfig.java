@@ -15,7 +15,7 @@ public class AiModelConfig {
 
         return OpenAiStreamingChatModel.builder()
                 .apiKey(apiKey)
-                .modelName("gpt-4o")
+                .modelName("gpt-3.5-turbo")
                 .temperature(0.7)
                 .build();
     }
