@@ -9,6 +9,7 @@ import com.bigpicture.moonrabbit.domain.item.dto.EquippedItemDTO;
 import com.bigpicture.moonrabbit.domain.item.service.UserItemService;
 import com.bigpicture.moonrabbit.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -113,6 +114,26 @@ public class BoardController {
 
 
         return ResponseEntity.ok(updatedBoardResponse);
+    }
+
+    @Operation(summary = "특정 유저 게시글 조회", description = "특정 유저 ID가 작성한 게시글 목록을 페이징으로 조회합니다.")
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<Map<String, Object>> listBoardsByUserPaged(
+            @Parameter(description = "조회할 유저 ID", example = "1")
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "2") int size
+    ) {
+        Page<BoardResponseDTO> pagedResult = boardService.selectPagedByUser(userId, page, size);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("totalCount", pagedResult.getTotalElements());
+        response.put("totalPages", pagedResult.getTotalPages());
+        response.put("pageNumber", pagedResult.getNumber());
+        response.put("pageSize", pagedResult.getSize());
+        response.put("content", pagedResult.getContent());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Operation(summary = "내 게시글 조회", description = "로그인한 사용자가 작성한 게시글 페이징 조회 + 총 글 개수")
