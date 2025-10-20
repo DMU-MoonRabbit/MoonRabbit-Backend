@@ -8,5 +8,5 @@ import reactor.core.publisher.Flux;
 public interface StreamingAssistant {
 
     @SystemMessage("You are a polite assistant")
-    Flux<String> chat(String userMessage);
+    String chat(String userMessage);
 }
