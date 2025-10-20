@@ -1,6 +1,7 @@
 package com.bigpicture.moonrabbit.domain.user.repository;
 
 import com.bigpicture.moonrabbit.domain.user.entity.User;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,4 +17,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // trustPoint 기준 랭킹
     Page<User> findAllByOrderByTrustPointDesc(Pageable pageable);
+
+    @NotNull
+    Optional<User> findById(Long id);
 }

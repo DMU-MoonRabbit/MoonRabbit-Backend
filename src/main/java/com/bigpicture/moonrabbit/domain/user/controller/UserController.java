@@ -74,6 +74,13 @@ public class UserController {
         User user = userService.getUserByEmail(email);
         return ResponseEntity.ok(new UserResponseDTO(user));
     }
+    
+    @Operation(summary = "특정 유저 조회", description = "유저 고유 id 번호를 통해 유저정보 조회")
+    @GetMapping("/users/{id}")
+    public ResponseEntity<UserResponseDTO> getUserId(@PathVariable Long id) {
+        User user = userService.getUserById(id);
+        return ResponseEntity.ok(new UserResponseDTO(user));
+    }
 
     // 로그인 API
     @Operation(summary = "로그인", description = "로그인시 토큰정보를 반환함")

@@ -16,6 +16,7 @@ public class UserResponseDTO {
     private int point;
     private int trustPoint;
     private String profileImg;
+    private int totalPoint;
 
     public UserResponseDTO(User user) {
         this.id = user.getId();
@@ -26,5 +27,6 @@ public class UserResponseDTO {
         this.point = user.getPoint();
         this.trustPoint = user.getTrustPoint();
         this.profileImg = user.getProfileImg();
+        this.totalPoint = user.getTotalPoint();
     }
 }
