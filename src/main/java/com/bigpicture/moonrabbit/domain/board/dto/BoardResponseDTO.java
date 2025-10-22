@@ -24,6 +24,7 @@ public class BoardResponseDTO {
     private int likeCount;
     private List<EquippedItemDTO> equippedItems;
     private boolean likedByMe;
+    private boolean isAnonymous;
 
     public BoardResponseDTO(Board board, Long currentUserId, List<EquippedItemDTO> equippedItems, List<AnswerResponseDTO> answerDTOs) {
         this.title = board.getTitle();
@@ -33,6 +34,7 @@ public class BoardResponseDTO {
         this.category = board.getCategory();
         this.likeCount = board.getLikeCount();
         this.answers = answerDTOs;
+        this.isAnonymous = board.isAnonymous();
 
         if (board.getSelectedAnswer() != null) {
             this.selectedAnswerId = board.getSelectedAnswer().getId();
