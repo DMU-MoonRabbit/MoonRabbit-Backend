@@ -8,6 +8,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.io.File;
 import java.util.Map;
@@ -106,6 +107,10 @@ public class FineTuningService {
 
             return completedModel;
 
+        } catch (WebClientResponseException e) { // 👈 WebClientResponseException 추가
+            log.error("[FineTuning] Error during execution: {} from {}", e.getStatusCode(), e.getRequest().getURI());
+            log.error("[FineTuning] OpenAI Error Body: {}", e.getResponseBodyAsString());
+            return null; // 에러 발생 시 null 반환
         } catch (Exception e) {
             log.error("[FineTuning] Error during execution: {}", e.getMessage(), e);
             return null;
