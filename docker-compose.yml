@@ -14,5 +14,5 @@ services:
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
-      TESSDATA_PREFIX: /usr/share/tesseract/tessdata/
+      TESSDATA_PREFIX: /usr/share/tesseract-ocr/5/tessdata/
     depends_on: []
