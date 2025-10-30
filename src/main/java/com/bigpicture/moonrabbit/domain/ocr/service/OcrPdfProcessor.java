@@ -5,7 +5,7 @@ import net.sourceforge.tess4j.Tesseract;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.stereotype.Service;
-
+import org.springframework.beans.factory.annotation.Value;
 import jakarta.annotation.PostConstruct;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -18,18 +18,22 @@ public class OcrPdfProcessor {
     private final ChatModel chatModel;
     private final BlockingQueue<Tesseract> tesseractPool = new ArrayBlockingQueue<>(Runtime.getRuntime().availableProcessors());
 
-    public OcrPdfProcessor(ChatModel chatModel) {
+    private final String tessPath;
+
+    // 생성자에서 경로를 @Value로 주입받도록 변경
+    public OcrPdfProcessor(ChatModel chatModel, @Value("${tesseract.datapath}") String tessPath) {
         this.chatModel = chatModel;
+        this.tessPath = tessPath;
     }
 
     @PostConstruct
     public void initPool() {
         int poolSize = Runtime.getRuntime().availableProcessors();
-        String tessPath = "C:\\Program Files\\Tesseract-OCR\\tessdata\\";
+//        String tessPath = "C:\\Program Files\\Tesseract-OCR\\tessdata\\";
 
         for (int i = 0; i < poolSize; i++) {
             Tesseract t = new Tesseract();
-            t.setDatapath(tessPath);
+            t.setDatapath(this.tessPath);
             t.setLanguage("kor+eng");
             tesseractPool.add(t);
         }
