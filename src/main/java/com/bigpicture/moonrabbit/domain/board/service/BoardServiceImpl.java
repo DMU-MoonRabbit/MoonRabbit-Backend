@@ -1,8 +1,6 @@
 package com.bigpicture.moonrabbit.domain.board.service;
 
 import com.bigpicture.moonrabbit.domain.answer.dto.AnswerResponseDTO;
-import com.bigpicture.moonrabbit.domain.answer.entity.Answer;
-import com.bigpicture.moonrabbit.domain.answer.repository.AnswerRepository;
 import com.bigpicture.moonrabbit.domain.board.dto.BoardRequestDTO;
 import com.bigpicture.moonrabbit.domain.board.dto.BoardResponseDTO;
 import com.bigpicture.moonrabbit.domain.board.entity.Board;
@@ -162,6 +160,11 @@ public class BoardServiceImpl implements BoardService {
 
         return boardRepository.findByUser_Id(userId, pageable)
                 .map(board -> toDto(board, userId));
+    }
+
+    @Override
+    public long getTotalBoardCount() {
+        return boardRepository.count();
     }
 }
 

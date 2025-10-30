@@ -157,4 +157,13 @@ public class BoardController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @Operation(summary = "총 게시글 수 조회", description = "데이터베이스에 저장된 전체 게시글 수를 조회합니다.")
+    @GetMapping("/count/total")
+    public ResponseEntity<Map<String, Long>> getTotalBoardCount() {
+        long count = boardService.getTotalBoardCount();
+        Map<String, Long> response = new HashMap<>();
+        response.put("totalCount", count);
+        return ResponseEntity.ok(response);
+    }
 }
