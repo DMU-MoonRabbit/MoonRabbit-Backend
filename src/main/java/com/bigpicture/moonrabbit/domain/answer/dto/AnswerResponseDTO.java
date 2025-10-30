@@ -35,9 +35,9 @@ public class AnswerResponseDTO {
 
         // 작성자 정보
         this.userId = answer.getUser().getId();
-        this.nickname = answer.getBoard().isAnonymous()
-                ? answer.getBoard().getAnonymousNickname()
-                : answer.getUser().getNickname();
+        this.nickname = (answer.getBoard().isAnonymous() && answer.getUser().getId().equals(answer.getBoard().getUser().getId()))
+                ? answer.getBoard().getAnonymousNickname() // (Case 1) 게시글 작성자의 댓글: 게시글의 익명 닉네임 사용
+                : answer.getUser().getNickname();          // (Case 2) 일반 댓글: 댓글 작성자의 본인 닉네임 사용
         this.profileImg = answer.getUser().getProfileImg();
         this.equippedItems = equippedItems;
         this.isSelected = answer.equals(answer.getBoard().getSelectedAnswer());
