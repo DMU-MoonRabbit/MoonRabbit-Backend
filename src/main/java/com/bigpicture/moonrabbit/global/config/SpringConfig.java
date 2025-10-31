@@ -48,6 +48,7 @@ import com.bigpicture.moonrabbit.domain.user.repository.UserRepository;
 import com.bigpicture.moonrabbit.domain.user.service.UserService;
 import com.bigpicture.moonrabbit.domain.user.service.UserServiceImpl;
 import com.bigpicture.moonrabbit.global.auth.jwt.generator.JwtGenerator;
+import com.bigpicture.moonrabbit.global.auth.jwt.provider.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -74,10 +75,11 @@ public class SpringConfig {
     private final DailyQuestionRepository dailyQuestionRepository;
     private final DailyAnswerRepository dailyAnswerRepository;
     private final NotificationRepository notificationRepository;
+    private final JwtProvider jwtTokenProvider;
 
     @Bean
     public UserService userService() {
-        return new UserServiceImpl(userRepository, passwordEncoder, jwtGenerator, smsRepository, userItemService());
+        return new UserServiceImpl(userRepository, passwordEncoder, jwtGenerator, jwtTokenProvider, smsRepository, userItemService());
     }
 
     @Bean

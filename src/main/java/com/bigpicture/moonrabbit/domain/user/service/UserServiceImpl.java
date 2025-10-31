@@ -11,6 +11,7 @@ import com.bigpicture.moonrabbit.domain.user.entity.User;
 import com.bigpicture.moonrabbit.domain.user.repository.UserRepository;
 import com.bigpicture.moonrabbit.global.auth.jwt.dto.JwtDTO;
 import com.bigpicture.moonrabbit.global.auth.jwt.generator.JwtGenerator;
+import com.bigpicture.moonrabbit.global.auth.jwt.provider.JwtProvider;
 import com.bigpicture.moonrabbit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,6 +32,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder; // 비밀번호 암호화 확인용
     private final JwtGenerator jwtGenerator; // JWT 생성기
+    private final JwtProvider jwtTokenProvider; // Refresh Token 유효성 검증을 위해 필드 추가
     private final SmsRepository smsRepository;
     private final UserItemService userItemService;
 
@@ -89,7 +91,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    // 이메일과 비밀번호로 로그인
+    @Transactional
     public JwtDTO login(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
@@ -101,9 +103,15 @@ public class UserServiceImpl implements UserService {
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new CustomException(ErrorCode.INVALID_PASSWORD); // 비밀번호 불일치 시 예외 발생
         }
+        // JWT 생성 (Access: 5분, Refresh: 14일)
+        JwtDTO jwtDTO = jwtGenerator.generateToken(user.getEmail(), user.getRole());
+
+        // Refresh Token 저장
+        user.updateRefreshToken(jwtDTO.refreshToken());
+        userRepository.save(user);
 
         // 로그인 성공시, 이메일과 권한정보를 같이 넘김
-        return jwtGenerator.generateToken(user.getEmail(), user.getRole());
+        return jwtDTO;
     }
 
     @Override
@@ -180,4 +188,25 @@ public class UserServiceImpl implements UserService {
         return new UserResponseDTO(savedUser);
     }
 
+    @Override
+    @Transactional
+    public JwtDTO reissueAccessToken(String refreshToken) {
+        // 1. Refresh Token 유효성 및 만료 여부 검증
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
+            throw new CustomException(ErrorCode.WRONG_ACCESS);
+        }
+
+        // 2. DB에서 Refresh Token을 가진 사용자 찾기
+        User user = userRepository.findByRefreshToken(refreshToken)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        // 3. 새로운 Access Token 및 Refresh Token 생성
+        JwtDTO newJwtDTO = jwtGenerator.generateToken(user.getEmail(), user.getRole());
+
+        // 4. 새 Refresh Token으로 DB 업데이트
+        user.updateRefreshToken(newJwtDTO.refreshToken());
+        userRepository.save(user);
+
+        return newJwtDTO;
+    }
 }

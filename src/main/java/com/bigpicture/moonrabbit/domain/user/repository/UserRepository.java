@@ -18,6 +18,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // trustPoint 기준 랭킹
     Page<User> findAllByOrderByTrustPointDesc(Pageable pageable);
 
+    // Refresh Token으로 유저 찾기 메서드 추가
+    Optional<User> findByRefreshToken(String refreshToken);
+
     @NotNull
     Optional<User> findById(Long id);
 }

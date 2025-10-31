@@ -38,6 +38,9 @@ public class User {
     @Column(length = 500)
     private String profileImg;
 
+    @Column(length = 500)
+    private String refreshToken;
+
     private String role = ROLE_USER;
     private int level = 1;
     private int trustPoint = 0;
@@ -71,6 +74,10 @@ public class User {
     // 누적 포인트 30점마다 1레벨
     public int calculateLevel(int totalPoint) {
         return totalPoint / 30 + 1;
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
 }

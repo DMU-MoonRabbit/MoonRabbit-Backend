@@ -38,4 +38,7 @@ public interface UserService {
     UserResponseDTO updateProfileImage(String email, String newImageUrl);
 
     User getUserById(Long id);
+
+    // Refresh Token을 사용하여 Access Token 재발급
+    JwtDTO reissueAccessToken(String refreshToken);
 }
