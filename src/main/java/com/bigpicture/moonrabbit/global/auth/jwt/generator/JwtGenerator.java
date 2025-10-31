@@ -26,9 +26,8 @@ public class JwtGenerator {
 
         long now = (new Date()).getTime();
 
-
-        // AccessToken 생성
-        Date accessTokenExpiresIn = new Date(now + 86400000);
+        // AccessToken 생성 (5분)
+        Date accessTokenExpiresIn = new Date(now + 300000);
 
         String accessToken = Jwts.builder()
                 .setSubject(String.valueOf(id))
@@ -37,9 +36,10 @@ public class JwtGenerator {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
-        //Refresh Token 생성
+        //Refresh Token 생성 (14일)
         String refreshToken = Jwts.builder()
-                .setExpiration(new Date(now + 86400000))
+                .setSubject(id)
+                .setExpiration(new Date(now + 1209600000L))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
