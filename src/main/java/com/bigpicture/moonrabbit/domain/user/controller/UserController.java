@@ -8,8 +8,10 @@ import com.bigpicture.moonrabbit.domain.user.entity.User;
 import com.bigpicture.moonrabbit.domain.user.service.UserService;
 import com.bigpicture.moonrabbit.global.auth.jwt.dto.JwtDTO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -165,6 +167,21 @@ public class UserController {
         UserResponseDTO responseDTO = userService.updateProfileImage(email, newImageUrl);
 
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    // Access Token 재발급 요청 DTO
+    public record ReissueRequestDTO(
+            @NotBlank(message = "Refresh Token은 필수입니다.")
+            @Schema(description = "리프레시 토큰", example = "eyJhbGciOiJIUzI1NiJ9...")
+            String refreshToken
+    ) {}
+
+    // 토큰 재발급 API
+    @PostMapping("/reissue")
+    @Operation(summary = "Access Token 재발급", description = "유효한 Refresh Token을 사용하여 Access Token을 재발급합니다.")
+    public ResponseEntity<JwtDTO> reissueToken(@Valid @RequestBody ReissueRequestDTO requestDTO) {
+        JwtDTO jwtDTO = userService.reissueAccessToken(requestDTO.refreshToken());
+        return new ResponseEntity<>(jwtDTO, HttpStatus.OK);
     }
 
 }
