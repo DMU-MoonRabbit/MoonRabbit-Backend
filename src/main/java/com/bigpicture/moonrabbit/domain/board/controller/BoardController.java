@@ -79,13 +79,14 @@ public class BoardController {
         return new ResponseEntity<>(responseDTO ,HttpStatus.OK);
     }
 
-    @Operation(summary = "게시글 페이징 조회", description = "게시글을 페이지 단위로 최신순 조회")
+    @Operation(summary = "게시글 페이징 조회", description = "게시글을 페이지 단위로 최신순 조회 (카테고리 필터링 가능)")
     @GetMapping("/list")
     public ResponseEntity<Page<BoardResponseDTO>> listBoardsPaged(
+            @RequestParam(required = false, defaultValue = "전체") String category, // 카테고리 파라미터 추가
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "9") int size
     ) {
-        Page<BoardResponseDTO> pagedResult = boardService.selectPaged(page, size);
+        Page<BoardResponseDTO> pagedResult = boardService.selectPaged(category, page, size); // 수정한 서비스 메서드 호출
         return new ResponseEntity<>(pagedResult, HttpStatus.OK);
     }
 
@@ -156,6 +157,18 @@ public class BoardController {
         response.put("content", pagedResult.getContent());
 
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "내 게시글 전체 조회", description = "로그인한 사용자가 작성한 모든 게시글을 조회합니다 (페이징 없음).")
+    @GetMapping("/my-all")
+    public ResponseEntity<List<BoardResponseDTO>> listMyAllBoards() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Long userId = userService.getUserIdByEmail(email);
+
+        List<BoardResponseDTO> allMyBoards = boardService.selectAllByUser(userId);
+
+        return new ResponseEntity<>(allMyBoards, HttpStatus.OK);
     }
 
     @Operation(summary = "총 게시글 수 조회", description = "데이터베이스에 저장된 전체 게시글 수를 조회합니다.")

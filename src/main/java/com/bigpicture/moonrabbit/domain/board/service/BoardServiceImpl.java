@@ -134,9 +134,16 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public Page<BoardResponseDTO> selectPaged(int page, int size) {
+    public Page<BoardResponseDTO> selectPaged(String category, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        return boardRepository.findAll(pageable).map(board -> toDto(board, null));
+
+        // "전체" 카테고리이거나 category 값이 비어있을 경우
+        if (category == null || category.isEmpty() || "전체".equals(category)) {
+            return boardRepository.findAll(pageable).map(board -> toDto(board, null));
+        } else {
+            // 특정 카테고리로 조회
+            return boardRepository.findByCategory(category, pageable).map(board -> toDto(board, null));
+        }
     }
 
 
@@ -165,6 +172,15 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public long getTotalBoardCount() {
         return boardRepository.count();
+    }
+
+    // 새로운 메서드 구현
+    @Override
+    public List<BoardResponseDTO> selectAllByUser(Long userId) {
+        return boardRepository.findByUser_IdOrderByCreatedAtDesc(userId)
+                .stream()
+                .map(board -> toDto(board, userId))
+                .collect(Collectors.toList());
     }
 }
 

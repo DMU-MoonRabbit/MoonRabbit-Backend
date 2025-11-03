@@ -18,11 +18,13 @@ public interface BoardService {
 
     BoardResponseDTO selectOne(Long id);
 
-    Page<BoardResponseDTO> selectPaged(int page, int size);
-
     BoardResponseDTO toDto(Board board, Long currentUserId);
 
     Page<BoardResponseDTO> selectPagedByUser(Long userId, int page, int size);
+    // 페이징 없는 전체 조회를 위한 메서드 추가
+    List<BoardResponseDTO> selectAllByUser(Long userId);
 
     long getTotalBoardCount();
+
+    Page<BoardResponseDTO> selectPaged(String category, int page, int size);
 }
