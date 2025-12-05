@@ -1,7 +1,6 @@
 package com.bigpicture.moonrabbit.domain.fine.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -12,7 +11,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.util.Map;
 
 @Service
@@ -52,17 +50,8 @@ public class FineTuningService {
             // Step 1: Upload JSONL file
             MultiValueMap<String, Object> multipartBody = new LinkedMultiValueMap<>();
 
-            // [수정된 로직 시작: ByteArrayResource를 사용하여 filename 명시]
-            // 1. 파일 내용을 byte 배열로 읽기 (IOException 발생 가능)
-            byte[] fileContent = Files.readAllBytes(jsonlFile.toPath());
-
-            // 2. ByteArrayResource를 생성하고, getFilename()을 오버라이드하여 파일 이름(.jsonl)을 강제 주입
-            ByteArrayResource resource = new ByteArrayResource(fileContent) {
-                @Override
-                public String getFilename() {
-                    return jsonlFile.getName(); // "fine_dataset_....jsonl" 파일명 사용
-                }
-            };
+            // FileSystemResource를 사용하여 스트리밍 방식으로 전송 (메모리 효율성 향상)
+            FileSystemResource resource = new FileSystemResource(jsonlFile);
 
             multipartBody.add("file", resource);
             multipartBody.add("purpose", "fine-tune");

@@ -55,12 +55,16 @@ public class OcrPdfProcessor {
             for (int page = 0; page < totalPages; page++) {
                 long pageStart = System.currentTimeMillis();
 
-                BufferedImage image = renderer.renderImageWithDPI(page, 300);
+                BufferedImage image = renderer.renderImageWithDPI(page, 150); // DPI 300 → 150으로 최적화 (필요시 72로 변경 가능)
                 Tesseract t = borrowTesseract();
                 try {
                     String text = t.doOCR(image);
                     result.append("\n--- Page ").append(page + 1).append(" ---\n").append(text);
                 } finally {
+                    // 명시적 메모리 해제
+                    if (image != null) {
+                        image.flush();
+                    }
                     returnTesseract(t);
                 }
 
@@ -85,7 +89,7 @@ public class OcrPdfProcessor {
         long start = System.currentTimeMillis();
         try (PDDocument document = PDDocument.load(pdfFile)) {
             PDFRenderer renderer = new PDFRenderer(document);
-            BufferedImage image = renderer.renderImageWithDPI(pageIndex, 300);
+            BufferedImage image = renderer.renderImageWithDPI(pageIndex, 150); // DPI 300 → 150으로 최적화 (필요시 72로 변경 가능)
 
             Tesseract t = borrowTesseract();
             try {
@@ -94,6 +98,10 @@ public class OcrPdfProcessor {
                 System.out.println("[DEBUG] Single page OCR completed (" + (end - start) + "ms)");
                 return text;
             } finally {
+                // 명시적 메모리 해제
+                if (image != null) {
+                    image.flush();
+                }
                 returnTesseract(t);
             }
         }
